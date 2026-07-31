@@ -12,7 +12,6 @@ import com.pashu360.app.feature.auth.presentation.LoginScreen
 import com.pashu360.app.feature.auth.presentation.OtpVerificationScreen
 import com.pashu360.app.feature.auth.presentation.RegisterScreen
 import com.pashu360.app.feature.auth.presentation.SplashScreen
-import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
 
 @Composable
 fun Pashu360NavHost(
@@ -91,9 +90,9 @@ fun Pashu360NavHost(
             )
         }
 
-        // ── DASHBOARD ────────────────────────────────────
+        // ── MAIN APP (bottom nav) ────────────────────────
         composable(Screen.Dashboard.route) {
-            DashboardScreen()
+            MainScaffold(rootNavController = navController)
         }
     }
 }

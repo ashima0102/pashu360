@@ -29,17 +29,20 @@ interface AnimalDao {
     @Query("SELECT * FROM animals WHERE farm_id = :farmId ORDER BY tag_id ASC")
     fun observeAll(farmId: String): Flow<List<AnimalEntity>>
 
+    // Non-suspend @Query methods work around a KSP2 bug where suspend @Query
+    // methods aren't emitted into the generated DAO_Impl. Callers dispatch
+    // to Dispatchers.IO in the repository.
     @Query("SELECT * FROM animals WHERE id = :id LIMIT 1")
-    suspend fun getById(id: String): AnimalEntity?
+    fun getById(id: String): AnimalEntity?
 
     @Query("SELECT * FROM animals WHERE id = :id LIMIT 1")
     fun observeById(id: String): Flow<AnimalEntity?>
 
     @Query("SELECT * FROM animals WHERE farm_id = :farmId AND tag_id = :tagId LIMIT 1")
-    suspend fun getByTag(farmId: String, tagId: String): AnimalEntity?
+    fun getByTag(farmId: String, tagId: String): AnimalEntity?
 
     @Query("SELECT * FROM animals WHERE farm_id = :farmId AND qr_code_data = :qrData LIMIT 1")
-    suspend fun getByQr(farmId: String, qrData: String): AnimalEntity?
+    fun getByQr(farmId: String, qrData: String): AnimalEntity?
 
     @Query("""
         SELECT * FROM animals
@@ -58,20 +61,21 @@ interface AnimalDao {
     @Query("SELECT COUNT(*) FROM animals WHERE farm_id = :farmId AND status = 'pregnant'")
     fun countPregnant(farmId: String): Flow<Int>
 
-    // NOTE: Explicit Long/Int return types are required — KSP2 has a bug where
-    // suspend functions returning Unit (V in JVM bytecode) fail with
-    // "unexpected jvm signature V". See https://github.com/google/ksp/issues/2957
+    // All mutations are non-suspend (see note above). Explicit Long/Int
+    // returns instead of Unit are also required — KSP2 additionally has
+    // "unexpected jvm signature V" on suspend fun returning Unit
+    // (see https://github.com/google/ksp/issues/2957).
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(animal: AnimalEntity): Long
+    fun insert(animal: AnimalEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(animals: List<AnimalEntity>): List<Long>
+    fun insertAll(animals: List<AnimalEntity>): List<Long>
 
     @Update
-    suspend fun update(animal: AnimalEntity): Int
+    fun update(animal: AnimalEntity): Int
 
     @Query("UPDATE animals SET status = :status, updated_at = :updatedAt WHERE id = :id")
-    suspend fun updateStatus(id: String, status: String, updatedAt: String): Int
+    fun updateStatus(id: String, status: String, updatedAt: String): Int
 
     @Query("DELETE FROM animals WHERE id = :id")
     fun deleteById(id: String): Int

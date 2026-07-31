@@ -42,6 +42,7 @@ import com.pashu360.app.feature.animal.presentation.AnimalDetailScreen
 import com.pashu360.app.feature.animal.presentation.AnimalListScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
+import com.pashu360.app.feature.health.presentation.HealthScreen
 import com.pashu360.app.feature.milk.presentation.MilkScreen
 import kotlinx.coroutines.launch
 
@@ -166,10 +167,10 @@ fun MainScaffold(
                 }
 
                 composable(Screen.Health.route) {
-                    ComingSoonScreen(
-                        title = "Health Management",
-                        subtitle = "Record health events, vaccination schedule with overdue alerts, veterinary visits, and vet contacts. Building in PR #4.",
-                        icon = Icons.Filled.Favorite
+                    HealthScreen(
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 

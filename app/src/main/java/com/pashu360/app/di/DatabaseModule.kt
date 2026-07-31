@@ -4,6 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import com.pashu360.app.core.data.local.AppDatabase
 import com.pashu360.app.feature.animal.data.local.AnimalDao
+import com.pashu360.app.feature.finance.data.local.FinancialRecordDao
+import com.pashu360.app.feature.health.data.local.HealthRecordDao
+import com.pashu360.app.feature.health.data.local.VaccinationDao
+import com.pashu360.app.feature.health.data.local.VetContactDao
+import com.pashu360.app.feature.milk.data.local.MilkRecordDao
+import com.pashu360.app.feature.notifications.data.local.AlertDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +30,23 @@ object DatabaseModule {
 
     @Provides
     fun provideAnimalDao(db: AppDatabase): AnimalDao = db.animalDao()
+
+    @Provides
+    fun provideMilkRecordDao(db: AppDatabase): MilkRecordDao = db.milkRecordDao()
+
+    @Provides
+    fun provideHealthRecordDao(db: AppDatabase): HealthRecordDao = db.healthRecordDao()
+
+    @Provides
+    fun provideVaccinationDao(db: AppDatabase): VaccinationDao = db.vaccinationDao()
+
+    @Provides
+    fun provideVetContactDao(db: AppDatabase): VetContactDao = db.vetContactDao()
+
+    @Provides
+    fun provideFinancialRecordDao(db: AppDatabase): FinancialRecordDao =
+        db.financialRecordDao()
+
+    @Provides
+    fun provideAlertDao(db: AppDatabase): AlertDao = db.alertDao()
 }

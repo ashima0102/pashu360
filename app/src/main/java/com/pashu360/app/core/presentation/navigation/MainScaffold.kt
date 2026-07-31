@@ -26,6 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pashu360.app.feature.notifications.presentation.AlertBadgeViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -42,6 +45,10 @@ import com.pashu360.app.feature.animal.presentation.AnimalDetailScreen
 import com.pashu360.app.feature.animal.presentation.AnimalListScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
+import com.pashu360.app.feature.finance.presentation.FinanceScreen
+import com.pashu360.app.feature.health.presentation.HealthScreen
+import com.pashu360.app.feature.milk.presentation.MilkScreen
+import com.pashu360.app.feature.notifications.presentation.AlertsScreen
 import kotlinx.coroutines.launch
 
 data class BottomNavItem(
@@ -53,8 +60,11 @@ data class BottomNavItem(
 @Composable
 fun MainScaffold(
     rootNavController: NavController,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    badgeViewModel: AlertBadgeViewModel = hiltViewModel()
 ) {
+    val alertCount by badgeViewModel.unresolvedCount.collectAsStateWithLifecycle()
+
     val bottomNavItems = listOf(
         BottomNavItem(Screen.Dashboard, Icons.Filled.Home, "Home"),
         BottomNavItem(Screen.Animals, Icons.Filled.Pets, "Animals"),
@@ -139,6 +149,7 @@ fun MainScaffold(
                 // ── BOTTOM TAB DESTINATIONS ─────────────────────
                 composable(Screen.Dashboard.route) {
                     DashboardScreen(
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -150,6 +161,7 @@ fun MainScaffold(
                         onAnimalClick = { id -> navController.navigate(Screen.AnimalDetail.createRoute(id)) },
                         onAddAnimalClick = { navController.navigate(Screen.AddAnimal.route) },
                         onScanQrClick = { navController.navigate(Screen.QrScanner.route) },
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -157,35 +169,39 @@ fun MainScaffold(
                 }
 
                 composable(Screen.Milk.route) {
-                    ComingSoonScreen(
-                        title = "Milk Production",
-                        subtitle = "Log morning + evening milk for your entire herd, weekly analytics, lactation tracking, and quality grading. Building next in PR #3.",
-                        icon = Icons.Filled.LocalDrink
+                    MilkScreen(
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 
                 composable(Screen.Health.route) {
-                    ComingSoonScreen(
-                        title = "Health Management",
-                        subtitle = "Record health events, vaccination schedule with overdue alerts, veterinary visits, and vet contacts. Building in PR #4.",
-                        icon = Icons.Filled.Favorite
+                    HealthScreen(
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 
                 composable(Screen.Finance.route) {
-                    ComingSoonScreen(
-                        title = "Finance",
-                        subtitle = "Profit & loss, monthly income/expense charts, expense breakdown, transaction log. Building in PR #5.",
-                        icon = Icons.Filled.AccountBalance
+                    FinanceScreen(
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 
                 // ── HEADER ACTIONS ──────────────────────────────
                 composable(Screen.Alerts.route) {
-                    ComingSoonScreen(
-                        title = "Alerts",
-                        subtitle = "All your farm alerts and reminders in one place. Bell badge shows unresolved count. Wired up in PR #6.",
-                        icon = Icons.Filled.Notifications
+                    AlertsScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenAnimal = { id ->
+                            navController.navigate(Screen.AnimalDetail.createRoute(id))
+                        }
                     )
                 }
 

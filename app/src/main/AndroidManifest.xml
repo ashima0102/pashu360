@@ -43,6 +43,19 @@
                 <data android:scheme="pashu360" />
             </intent-filter>
         </activity>
+
+        <!-- Disable the default WorkManagerInitializer;
+             we provide Configuration via Pashu360App (Hilt worker factory). -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
     </application>
 
 </manifest>

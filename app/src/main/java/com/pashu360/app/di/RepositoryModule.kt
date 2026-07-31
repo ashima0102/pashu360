@@ -2,6 +2,14 @@ package com.pashu360.app.di
 
 import com.pashu360.app.feature.animal.data.repository.AnimalRepositoryImpl
 import com.pashu360.app.feature.animal.domain.repository.AnimalRepository
+import com.pashu360.app.feature.finance.data.repository.FinanceRepositoryImpl
+import com.pashu360.app.feature.finance.domain.repository.FinanceRepository
+import com.pashu360.app.feature.health.data.repository.HealthRepositoryImpl
+import com.pashu360.app.feature.health.domain.repository.HealthRepository
+import com.pashu360.app.feature.milk.data.repository.MilkRepositoryImpl
+import com.pashu360.app.feature.milk.domain.repository.MilkRepository
+import com.pashu360.app.feature.notifications.data.repository.AlertRepositoryImpl
+import com.pashu360.app.feature.notifications.domain.repository.AlertRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,4 +23,20 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAnimalRepository(impl: AnimalRepositoryImpl): AnimalRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMilkRepository(impl: MilkRepositoryImpl): MilkRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHealthRepository(impl: HealthRepositoryImpl): HealthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFinanceRepository(impl: FinanceRepositoryImpl): FinanceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAlertRepository(impl: AlertRepositoryImpl): AlertRepository
 }

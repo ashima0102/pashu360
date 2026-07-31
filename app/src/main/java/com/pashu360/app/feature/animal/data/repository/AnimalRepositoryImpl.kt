@@ -7,12 +7,14 @@ import com.pashu360.app.feature.animal.data.local.AnimalEntity
 import com.pashu360.app.feature.animal.domain.repository.AnimalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalTime::class)
 @Singleton
 class AnimalRepositoryImpl @Inject constructor(
     private val dao: AnimalDao

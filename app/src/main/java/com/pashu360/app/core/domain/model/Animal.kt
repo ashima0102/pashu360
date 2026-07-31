@@ -2,11 +2,13 @@ package com.pashu360.app.core.domain.model
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import java.util.UUID
 
+@OptIn(ExperimentalTime::class)
 data class Animal(
     val id: String = UUID.randomUUID().toString(),
     val farmId: String,

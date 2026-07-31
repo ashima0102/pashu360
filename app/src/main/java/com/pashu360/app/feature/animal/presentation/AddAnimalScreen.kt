@@ -35,11 +35,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pashu360.app.core.domain.model.BreedCatalog
 import com.pashu360.app.core.domain.model.Gender
 import com.pashu360.app.core.presentation.theme.PashuGreen
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import android.widget.Toast
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -357,7 +357,6 @@ private fun DobPicker(dob: LocalDate?, onDobChanged: (LocalDate?) -> Unit) {
     )
 
     if (showDialog) {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         val state = rememberDatePickerState(
             initialSelectedDateMillis = System.currentTimeMillis()
         )
@@ -366,6 +365,7 @@ private fun DobPicker(dob: LocalDate?, onDobChanged: (LocalDate?) -> Unit) {
             confirmButton = {
                 TextButton(onClick = {
                     state.selectedDateMillis?.let { millis ->
+                        @OptIn(ExperimentalTime::class)
                         val date = Instant.fromEpochMilliseconds(millis)
                             .toLocalDateTime(TimeZone.UTC).date
                         onDobChanged(date)

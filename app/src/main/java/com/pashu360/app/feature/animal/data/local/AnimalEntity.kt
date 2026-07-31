@@ -7,11 +7,12 @@ import androidx.room.PrimaryKey
 import com.pashu360.app.core.domain.model.Animal
 import com.pashu360.app.core.domain.model.AnimalStatus
 import com.pashu360.app.core.domain.model.Gender
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import java.util.UUID
 
 @Entity(
@@ -86,6 +87,7 @@ data class AnimalEntity(
     )
 
     companion object {
+        @OptIn(ExperimentalTime::class)
         fun fromDomain(domain: Animal): AnimalEntity = AnimalEntity(
             id = domain.id,
             farmId = domain.farmId,
@@ -117,6 +119,7 @@ data class AnimalEntity(
             updatedAt = domain.updatedAt.toString()
         )
 
+        @OptIn(ExperimentalTime::class)
         private fun nowIso(): String =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toString()
     }

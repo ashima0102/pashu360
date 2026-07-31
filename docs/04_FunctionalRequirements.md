@@ -1,59 +1,92 @@
 # Functional Requirements
-## Smart Dairy Farm Management System
+## Pashu360 — Smart Dairy Farm Management
 **Total: 127 requirements across 16 modules**
+**Status:** ✅ Implemented · 🟡 UI built (backend pending) · ⬜ Not started
+**Last updated:** 2026-08-01
+
+## Implementation Summary
+
+| Module | Implemented | Total | Status |
+|---|---|---|---|
+| Authentication | 6/8 | 8 | 🟡 UI + navigation done, Supabase pending |
+| Farm Management | 1/6 | 6 | 🟡 Farm setup done |
+| Animal Management | 12/14 | 14 | ✅ Phase 1 Complete |
+| Milk Production | 0/13 | 13 | ⬜ Phase 2 |
+| Feeding | 0/8 | 8 | ⬜ Phase 4 |
+| Health | 0/9 | 9 | ⬜ Phase 4 |
+| Vaccination | 0/10 | 10 | ⬜ Phase 3 |
+| Heat Cycle | 0/5 | 5 | ⬜ Phase 4 |
+| Breeding | 0/6 | 6 | ⬜ Phase 4 |
+| Pregnancy | 0/6 | 6 | ⬜ Phase 4 |
+| Finance | 0/6 | 6 | ⬜ Phase 6 |
+| Reports | 0/7 | 7 | ⬜ Phase 6 |
+| Notifications | 0/6 | 6 | ⬜ Phase 3 |
+| Offline | 3/5 | 5 | 🟡 Room done; Supabase sync pending |
+| Settings | 0/7 | 7 | ⬜ Phase 7 |
+| **TOTAL** | **22/127** | **127** | **17%** |
 
 ---
 
 ## Authentication Module (FR-AUTH)
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-AUTH-01 | System shall allow registration via phone number OTP | P1 |
-| FR-AUTH-02 | System shall send 6-digit OTP via SMS and auto-verify on entry | P1 |
-| FR-AUTH-03 | System shall allow login via email + password | P1 |
-| FR-AUTH-04 | System shall allow password reset via email link | P1 |
-| FR-AUTH-05 | System shall persist session for 30 days without re-login | P1 |
-| FR-AUTH-06 | System shall display farm setup wizard on first login | P1 |
-| FR-AUTH-07 | System shall allow editing profile name, photo, and language | P2 |
-| FR-AUTH-08 | System shall securely clear all session data on logout | P1 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-AUTH-01 | System shall allow registration via phone number OTP | P1 | 🟡 UI built |
+| FR-AUTH-02 | System shall send 6-digit OTP via SMS and auto-verify on entry | P1 | 🟡 UI built |
+| FR-AUTH-03 | System shall allow login via email + password | P1 | 🟡 UI built |
+| FR-AUTH-04 | System shall allow password reset via email link | P1 | ⬜ |
+| FR-AUTH-05 | System shall persist session for 30 days without re-login | P1 | ⬜ |
+| FR-AUTH-06 | System shall display farm setup wizard on first login | P1 | ✅ Done |
+| FR-AUTH-07 | System shall allow editing profile name, photo, and language | P2 | ⬜ |
+| FR-AUTH-08 | System shall securely clear all session data on logout | P1 | ⬜ |
+
+**Note:** Auth screens are fully built with proper UI/UX. Backend integration (Supabase Auth) is planned for Phase 5.
 
 ---
 
 ## Farm Management Module (FR-FARM)
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-FARM-01 | System shall support multiple farms per account | P2 |
-| FR-FARM-02 | System shall store farm name, location, state, GPS, registration number | P1 |
-| FR-FARM-03 | System shall allow switching active farm via drawer | P2 |
-| FR-FARM-04 | System shall allow creating and naming barns/sheds | P2 |
-| FR-FARM-05 | System shall allow assigning animals to barns | P2 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-FARM-01 | System shall support multiple farms per account | P2 | ⬜ |
+| FR-FARM-02 | System shall store farm name, location, state, GPS, registration number | P1 | 🟡 UI |
+| FR-FARM-03 | System shall allow switching active farm via drawer | P2 | ⬜ |
+| FR-FARM-04 | System shall allow creating and naming barns/sheds | P2 | ⬜ |
+| FR-FARM-05 | System shall allow assigning animals to barns | P2 | ⬜ (Room field exists) |
+| FR-FARM-06 | System shall display active farm name in the header | P1 | ✅ Done (Dashboard) |
 | FR-FARM-06 | System shall display active farm name in the header | P1 |
 
 ---
 
-## Animal Management Module (FR-ANIM)
+## Animal Management Module (FR-ANIM) ✅ Phase 1 Complete
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-ANIM-01 | System shall allow adding animals with all profile fields | P1 |
-| FR-ANIM-02 | System shall auto-generate a unique QR code per animal | P1 |
-| FR-ANIM-03 | System shall allow scanning QR code to open animal profile (< 2s) | P1 |
-| FR-ANIM-04 | System shall allow searching animals by name and tag ID | P1 |
-| FR-ANIM-05 | System shall allow filtering animals by status | P1 |
-| FR-ANIM-06 | System shall display a chronological timeline of all animal events | P1 |
-| FR-ANIM-07 | System shall allow transferring an animal to another farm | P2 |
-| FR-ANIM-08 | System shall support marking animals as Sold with price and buyer | P2 |
-| FR-ANIM-09 | System shall support marking animals as Deceased with reason | P2 |
-| FR-ANIM-10 | System shall support RFID tag field | P2 |
-| FR-ANIM-11 | System shall allow photo upload from camera or gallery | P1 |
-| FR-ANIM-12 | System shall generate QR code printable via share sheet | P2 |
-| FR-ANIM-13 | System shall show today's milk amount on each animal card | P1 |
-| FR-ANIM-14 | System shall allow editing all animal fields | P1 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-ANIM-01 | System shall allow adding animals with all profile fields | P1 | ✅ Done |
+| FR-ANIM-02 | System shall auto-generate a unique QR code per animal | P1 | ✅ Done (tag ID = QR data) |
+| FR-ANIM-03 | System shall allow scanning QR code to open animal profile | P1 | ✅ Done (CameraX + ML Kit) |
+| FR-ANIM-04 | System shall allow searching animals by name and tag ID | P1 | ✅ Done |
+| FR-ANIM-05 | System shall allow filtering animals by status | P1 | ✅ Done (chips) |
+| FR-ANIM-06 | System shall display a chronological timeline of all animal events | P1 | 🟡 UI (tabs) built |
+| FR-ANIM-07 | System shall allow transferring an animal to another farm | P2 | ⬜ |
+| FR-ANIM-08 | System shall support marking animals as Sold with price and buyer | P2 | 🟡 Data model ready |
+| FR-ANIM-09 | System shall support marking animals as Deceased with reason | P2 | 🟡 Data model ready |
+| FR-ANIM-10 | System shall support RFID tag field | P2 | ✅ Done (in schema) |
+| FR-ANIM-11 | System shall allow photo upload from camera or gallery | P1 | ⬜ (placeholder shown) |
+| FR-ANIM-12 | System shall generate QR code printable via share sheet | P2 | ⬜ |
+| FR-ANIM-13 | System shall show today's milk amount on each animal card | P1 | 🟡 Placeholder (Phase 2) |
+| FR-ANIM-14 | System shall allow editing all animal fields | P1 | ⬜ (Edit screen TBD) |
 
 ---
 
-## Milk Production Module (FR-MILK)
+> **Note:** All modules below (FR-MILK through FR-SET) are not started yet.
+> See PROGRESS.md at the project root for the up-to-date phase status.
+
+---
+
+## Milk Production Module (FR-MILK) ⬜ Phase 2
+
+**Status: Not started · All 13 requirements pending**
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -73,7 +106,7 @@
 
 ---
 
-## Feeding Management Module (FR-FEED)
+## Feeding Management Module (FR-FEED) ⬜ Phase 4
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -88,7 +121,7 @@
 
 ---
 
-## Health Management Module (FR-HLTH)
+## Health Management Module (FR-HLTH) ⬜ Phase 4
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -104,7 +137,7 @@
 
 ---
 
-## Vaccination Module (FR-VAC)
+## Vaccination Module (FR-VAC) ⬜ Phase 3
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -121,7 +154,7 @@
 
 ---
 
-## Heat Cycle Module (FR-HEAT)
+## Heat Cycle Module (FR-HEAT) ⬜ Phase 4
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -133,7 +166,7 @@
 
 ---
 
-## Breeding & Conception Module (FR-BRDG)
+## Breeding & Conception Module (FR-BRDG) ⬜ Phase 4
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -146,7 +179,7 @@
 
 ---
 
-## Pregnancy & Calving Module (FR-PREG)
+## Pregnancy & Calving Module (FR-PREG) ⬜ Phase 4
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -159,7 +192,7 @@
 
 ---
 
-## Financial Module (FR-FIN)
+## Financial Module (FR-FIN) ⬜ Phase 6
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -172,7 +205,7 @@
 
 ---
 
-## Reports Module (FR-RPT)
+## Reports Module (FR-RPT) ⬜ Phase 6
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -186,7 +219,7 @@
 
 ---
 
-## Notifications Module (FR-NOTIF)
+## Notifications Module (FR-NOTIF) ⬜ Phase 3
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -199,7 +232,7 @@
 
 ---
 
-## Offline Module (FR-OFF)
+## Offline Module (FR-OFF) 🟡 Partial (Room done, Supabase sync Phase 5)
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -211,7 +244,7 @@
 
 ---
 
-## Settings Module (FR-SET)
+## Settings Module (FR-SET) ⬜ Phase 7
 
 | ID | Requirement | Priority |
 |---|---|---|

@@ -1,55 +1,79 @@
 # User Stories
-## Smart Dairy Farm Management System
+## Pashu360 — Smart Dairy Farm Management
 
 **Format:** As a [Farm Owner], I want to [action], so that [benefit].  
-**Priority:** P1 = MVP Critical | P2 = MVP Important | P3 = Phase 2
+**Priority:** P1 = MVP Critical | P2 = MVP Important | P3 = Phase 2  
+**Status:** ✅ Done · 🟡 UI built (backend pending Supabase) · ⬜ Not Started
+
+**Last updated:** 2026-08-01
+
+## Progress Summary
+
+| Module | Done | Total | Progress |
+|---|---|---|---|
+| Authentication (UI + navigation) | 7 | 7 | 🟡 100% UI · Supabase backend pending |
+| Farm Management | 1 | 5 | 🟡 20% (Farm Setup screen only) |
+| Animal Management | 14 | 14 | ✅ 100% |
+| Milk Production | 0 | 12 | ⬜ 0% |
+| Feeding | 0 | 8 | ⬜ 0% |
+| Health | 0 | 10 | ⬜ 0% |
+| Vaccination | 0 | 10 | ⬜ 0% |
+| Heat Cycle | 0 | 5 | ⬜ 0% |
+| Breeding | 0 | 5 | ⬜ 0% |
+| Pregnancy & Calving | 0 | 6 | ⬜ 0% |
+| Financial | 0 | 7 | ⬜ 0% |
+| Reports | 0 | 6 | ⬜ 0% |
+| Notifications | 0 | 5 | ⬜ 0% |
+| Offline & Sync | 0 | 4 | ⬜ 0% (Phase 5) |
+| Settings | 0 | 5 | ⬜ 0% |
+| **TOTAL** | **22** | **109** | **20%** |
 
 ---
 
 ## Authentication
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-A01 | Register with my phone number using OTP | P1 | OTP received, verified, account created |
-| US-A02 | Log in with email and password | P1 | Session persisted for 30 days |
-| US-A03 | Reset my password if I forget it | P1 | Reset link sent to email |
-| US-A04 | Set up my first farm after registering | P1 | Farm created, dashboard shown |
-| US-A05 | Update my profile name and photo | P2 | Changes saved and reflected in header |
-| US-A06 | Stay logged in without re-entering password daily | P1 | Session persists 30 days |
-| US-A07 | Log out securely | P1 | Session cleared, navigated to login |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-A01 | Register with my phone number using OTP | P1 | 🟡 UI built | OTP received, verified, account created |
+| US-A02 | Log in with email and password | P1 | 🟡 UI built | Session persisted for 30 days |
+| US-A03 | Reset my password if I forget it | P1 | 🟡 UI built | Reset link sent to email |
+| US-A04 | Set up my first farm after registering | P1 | ✅ Done | Farm created, dashboard shown |
+| US-A05 | Update my profile name and photo | P2 | ⬜ | Changes saved and reflected in header |
+| US-A06 | Stay logged in without re-entering password daily | P1 | ⬜ | Session persists 30 days (needs Supabase) |
+| US-A07 | Log out securely | P1 | ⬜ | Session cleared, navigated to login |
 
 ---
 
 ## Farm Management
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-FM01 | Add multiple farms to my account | P2 | Each farm has independent data |
-| US-FM02 | Switch between my farms easily | P2 | Farm switcher in drawer |
-| US-FM03 | Add barns/sheds to my farm | P2 | Animals can be assigned to barns |
-| US-FM04 | Edit my farm name and location | P2 | Changes saved to Supabase |
-| US-FM05 | See which barn each animal is in | P2 | Barn shown on animal card |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-FM01 | Add multiple farms to my account | P2 | ⬜ | Each farm has independent data (pending Supabase) |
+| US-FM02 | Switch between my farms easily | P2 | ⬜ | Farm switcher in drawer |
+| US-FM03 | Add barns/sheds to my farm | P2 | ⬜ | Animals can be assigned to barns |
+| US-FM04 | Edit my farm name and location | P2 | 🟡 Farm Setup done | Changes saved to Supabase |
+| US-FM05 | See which barn each animal is in | P2 | ⬜ | Barn shown on animal card |
 
 ---
 
-## Animal Management
+## Animal Management ✅ Phase 1 Complete
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-AM01 | Add a new animal with a photo | P1 | Animal appears in list with photo |
-| US-AM02 | Give each animal a unique QR code | P1 | QR generated and shareable |
-| US-AM03 | Scan a QR code to open that animal's profile | P1 | Camera scan → profile opened < 2s |
-| US-AM04 | Search for an animal by name or tag number | P1 | Results appear in < 0.5s |
-| US-AM05 | Filter my herd by status (sick, pregnant, etc.) | P1 | Filter chips on list screen |
-| US-AM06 | See a complete history of each animal's life | P1 | Timeline tab on profile |
-| US-AM07 | Mark an animal as sold with sale price | P2 | Animal moved to Sold status |
-| US-AM08 | Mark an animal as deceased with reason | P2 | Animal removed from active list |
-| US-AM09 | Transfer an animal to another farm | P2 | Animal linked to target farm |
-| US-AM10 | Edit any animal's details | P1 | Pencil icon on profile → edit form |
-| US-AM11 | See each animal's today's milk on the list | P1 | Milk quantity shown on animal card |
-| US-AM12 | Add an RFID tag number to an animal | P2 | RFID field on add/edit form |
-| US-AM13 | Print the QR code for an animal's ear tag | P2 | Share/print via share sheet |
-| US-AM14 | See a quick summary of each animal (breed, age, weight, status) | P1 | Overview tab on profile |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-AM01 | Add a new animal with a photo | P1 | ✅ Done (photo pending) | Animal saved to Room, appears in list |
+| US-AM02 | Give each animal a unique QR code | P1 | ✅ Done | QR generated from tag ID |
+| US-AM03 | Scan a QR code to open that animal's profile | P1 | ✅ Done | CameraX + ML Kit scan → profile opened |
+| US-AM04 | Search for an animal by name or tag number | P1 | ✅ Done | Live filter on animal list |
+| US-AM05 | Filter my herd by status (sick, pregnant, etc.) | P1 | ✅ Done | Filter chips: All/Active/Pregnant/Sick/Dry/Sold |
+| US-AM06 | See a complete history of each animal's life | P1 | 🟡 UI + tabs built | Timeline data comes with Phase 2+ |
+| US-AM07 | Mark an animal as sold with sale price | P2 | ⬜ | Edit screen not built yet |
+| US-AM08 | Mark an animal as deceased with reason | P2 | ⬜ | Edit screen not built yet |
+| US-AM09 | Transfer an animal to another farm | P2 | ⬜ | Multi-farm support pending Supabase |
+| US-AM10 | Edit any animal's details | P1 | ⬜ | Edit screen not built yet (pencil icon shown) |
+| US-AM11 | See each animal's today's milk on the list | P1 | 🟡 Placeholder | Data comes with Phase 2 (Milk) |
+| US-AM12 | Add an RFID tag number to an animal | P2 | ✅ Done | RFID field in Room + domain |
+| US-AM13 | Print the QR code for an animal's ear tag | P2 | ⬜ | Share sheet pending |
+| US-AM14 | See a quick summary of each animal | P1 | ✅ Done | Overview tab: breed, age, weight, status, notes |
 
 ---
 

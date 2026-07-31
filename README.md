@@ -8,17 +8,17 @@
 
 ## Project Status
 
-**Phase 0 — Foundation ✅ In Progress**
+📊 **[View live progress in PROGRESS.md →](./PROGRESS.md)**
+📝 **[View changelog in CHANGELOG.md →](./CHANGELOG.md)**
 
-Currently building:
-- ✅ Project setup with Kotlin + Jetpack Compose
-- ✅ Clean Architecture (MVVM + Repository pattern)
-- ✅ Material 3 theme (Pashu360 green/brown farm palette)
-- ✅ Navigation shell (Compose Navigation)
-- ✅ Splash + Login screens
-- ⏳ Supabase auth integration
-- ⏳ Room database setup
-- ⏳ Hilt dependency injection
+**Current phase:** Phase 1 complete · Ready to start Phase 2
+
+| Phase | Status |
+|---|---|
+| Phase 0 — Foundation & Auth | ✅ Done |
+| Phase 1 — Animal Management | ✅ Done |
+| Phase 2 — Milk Production | ⬜ Next |
+| Phase 3–7 | ⬜ Planned |
 
 ---
 

@@ -79,6 +79,12 @@ Pashu360/
 
 ---
 
+## Contributing
+
+**All changes go through pull requests. `main` is protected.** See [CONTRIBUTING.md](./CONTRIBUTING.md) for the branching workflow, commit conventions, and architecture rules.
+
+---
+
 ## Documentation
 
 See the [docs/](./docs/) folder for complete documentation (30 documents):

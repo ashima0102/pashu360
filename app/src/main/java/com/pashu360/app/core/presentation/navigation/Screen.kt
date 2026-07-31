@@ -10,12 +10,25 @@ sealed class Screen(val route: String) {
     object Register : Screen("register")
     object FarmSetup : Screen("farm_setup")
 
-    // Main Graph — Bottom Nav
+    // Main Graph — Bottom Nav (5 tabs)
     object Dashboard : Screen("dashboard")
     object Animals : Screen("animals")
     object Milk : Screen("milk")
+    object Health : Screen("health")
+    object Finance : Screen("finance")
+
+    // Header actions
     object Alerts : Screen("alerts")
-    object More : Screen("more")
+    object Profile : Screen("profile")
+
+    // Drawer destinations
+    object FarmInfo : Screen("farm_info")
+    object Feeding : Screen("feeding")
+    object Breeding : Screen("breeding")
+    object Pregnancy : Screen("pregnancy")
+    object Reports : Screen("reports")
+    object Settings : Screen("settings")
+    object Help : Screen("help")
 
     // Animal sub-screens
     object AnimalDetail : Screen("animal_detail/{animalId}") {
@@ -35,13 +48,8 @@ sealed class Screen(val route: String) {
     object AddVaccination : Screen("add_vaccination")
 
     // Health
-    object HealthOverview : Screen("health_overview")
     object LogHealthEvent : Screen("log_health_event")
 
     // Feeding
-    object FeedingOverview : Screen("feeding_overview")
     object LogFeed : Screen("log_feed")
-
-    // Settings
-    object Settings : Screen("settings")
 }

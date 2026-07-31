@@ -49,11 +49,7 @@ fun ComingSoonScreen(
             shape = MaterialTheme.shapes.large
         ) {
             Text(
-                "🚧 Coming soon in Phase " + when (title) {
-                    "Milk" -> "2"
-                    "Alerts" -> "3"
-                    else -> "4+"
-                },
+                "🚧 Coming soon",
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,

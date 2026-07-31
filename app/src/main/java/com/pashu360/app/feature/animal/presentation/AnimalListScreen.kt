@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pashu360.app.core.domain.model.Animal
 import com.pashu360.app.core.domain.model.AnimalFilter
 import com.pashu360.app.core.domain.model.AnimalStatus
+import com.pashu360.app.core.presentation.components.PashuAppBar
 import com.pashu360.app.core.presentation.theme.ColorPregnant
 import com.pashu360.app.core.presentation.theme.ColorSick
 import com.pashu360.app.core.presentation.theme.PashuAmber
@@ -42,7 +43,11 @@ fun AnimalListScreen(
     viewModel: AnimalListViewModel = hiltViewModel(),
     onAnimalClick: (String) -> Unit,
     onAddAnimalClick: () -> Unit,
-    onScanQrClick: () -> Unit
+    onScanQrClick: () -> Unit,
+    alertCount: Int = 0,
+    onMenuClick: () -> Unit = {},
+    onBellClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -60,62 +65,63 @@ fun AnimalListScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(WindowInsets.statusBars.asPaddingValues())
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("My Herd",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White)
-                            Text("${uiState.animals.size} animals total",
-                                fontSize = 13.sp,
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontWeight = FontWeight.Medium)
-                        }
-                        // QR scan icon button
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.2f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            IconButton(onClick = onScanQrClick) {
-                                Icon(
-                                    Icons.Filled.QrCodeScanner,
-                                    contentDescription = "Scan QR",
-                                    tint = Color.White
-                                )
+                    // Reusable app bar
+                    PashuAppBar(
+                        title = "My Herd",
+                        alertCount = alertCount,
+                        onMenuClick = onMenuClick,
+                        onBellClick = onBellClick,
+                        onProfileClick = onProfileClick
+                    )
+
+                    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                        Text("${uiState.animals.size} animals total",
+                            fontSize = 13.sp,
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontWeight = FontWeight.Medium)
+
+                        Spacer(Modifier.height(12.dp))
+
+                        // Search bar + QR button
+                        Row(verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedTextField(
+                                value = uiState.searchQuery,
+                                onValueChange = viewModel::onSearchQueryChanged,
+                                placeholder = { Text("Search by name or tag...",
+                                    color = Color.White.copy(alpha = 0.7f)) },
+                                leadingIcon = { Icon(Icons.Filled.Search, null, tint = Color.White) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(14.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color.White,
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                    cursorColor = Color.White,
+                                    focusedContainerColor = Color.White.copy(alpha = 0.15f),
+                                    unfocusedContainerColor = Color.White.copy(alpha = 0.15f)
+                                ),
+                                modifier = Modifier.weight(1f)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(Color.White.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                IconButton(onClick = onScanQrClick) {
+                                    Icon(
+                                        Icons.Filled.QrCodeScanner,
+                                        contentDescription = "Scan QR",
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         }
                     }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    // Search bar
-                    OutlinedTextField(
-                        value = uiState.searchQuery,
-                        onValueChange = viewModel::onSearchQueryChanged,
-                        placeholder = { Text("Search by name or tag...",
-                            color = Color.White.copy(alpha = 0.7f)) },
-                        leadingIcon = { Icon(Icons.Filled.Search, null, tint = Color.White) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            cursorColor = Color.White,
-                            focusedContainerColor = Color.White.copy(alpha = 0.15f),
-                            unfocusedContainerColor = Color.White.copy(alpha = 0.15f)
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
 
                     Spacer(Modifier.height(16.dp))
                 }

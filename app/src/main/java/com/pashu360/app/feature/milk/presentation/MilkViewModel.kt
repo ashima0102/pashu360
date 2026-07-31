@@ -64,14 +64,23 @@ class MilkViewModel @Inject constructor(
     private val _quantityInputs = MutableStateFlow(emptyMap<String, String>())
     private val _fatInputs = MutableStateFlow(emptyMap<String, String>())
     private val _snfInputs = MutableStateFlow(emptyMap<String, String>())
-    private val _entries = MutableStateFlow(emptyList<BulkMilkEntry>())
     private val _showQualityFields = MutableStateFlow(false)
     private val _isSaving = MutableStateFlow(false)
+
+    // Track which animals the user has manually typed in — so their edits aren't
+    // overwritten by the reactive flow re-emitting the same data.
+    private val touchedAnimals = mutableSetOf<String>()
 
     private val _events = Channel<MilkEvent>()
     val events = _events.receiveAsFlow()
 
     private val farmId get() = sessionStore.getActiveFarmId()
+
+    /** Reactive list of active animals + their existing session records. */
+    private val entriesFlow = combine(_selectedDate, _selectedSession) { d, s -> d to s }
+        .flatMapLatest { (date, session) ->
+            repository.observeBulkEntry(farmId, date, session)
+        }
 
     /** Reactive daily total for the selected date. */
     private val dailyTotalFlow = _selectedDate.flatMapLatest { date ->
@@ -84,12 +93,29 @@ class MilkViewModel @Inject constructor(
     }
 
     init {
-        loadEntries()
+        // Prefill (or re-fill) inputs when animals/records change, without stomping
+        // on values the user is currently typing.
+        viewModelScope.launch {
+            entriesFlow.collect { list ->
+                _quantityInputs.value = list.associate { entry ->
+                    val current = _quantityInputs.value[entry.animalId]
+                    val next = if (entry.animalId in touchedAnimals) current.orEmpty()
+                               else entry.existingQuantity?.toString().orEmpty()
+                    entry.animalId to next
+                }
+                _fatInputs.value = list.associate { entry ->
+                    entry.animalId to (entry.existingFat?.toString().orEmpty())
+                }
+                _snfInputs.value = list.associate { entry ->
+                    entry.animalId to (entry.existingSnf?.toString().orEmpty())
+                }
+            }
+        }
     }
 
     // Group the many state sources — Kotlin combine tops out at 5.
     private val groupA = combine(
-        _selectedDate, _selectedSession, _entries, _showQualityFields, _isSaving
+        _selectedDate, _selectedSession, entriesFlow, _showQualityFields, _isSaving
     ) { date, session, entries, showQual, saving -> Quintuple(date, session, entries, showQual, saving) }
 
     private val groupB = combine(
@@ -120,33 +146,16 @@ class MilkViewModel @Inject constructor(
         val first: A, val second: B, val third: C, val fourth: D, val fifth: E
     )
 
-    private fun loadEntries() {
-        viewModelScope.launch {
-            val list = repository.buildBulkEntry(
-                farmId, _selectedDate.value, _selectedSession.value
-            )
-            _entries.value = list
-            // Prefill inputs with existing values
-            _quantityInputs.value = list.associate { entry ->
-                entry.animalId to (entry.existingQuantity?.toString().orEmpty())
-            }
-            _fatInputs.value = list.associate { entry ->
-                entry.animalId to (entry.existingFat?.toString().orEmpty())
-            }
-            _snfInputs.value = list.associate { entry ->
-                entry.animalId to (entry.existingSnf?.toString().orEmpty())
-            }
-        }
-    }
-
     fun onSessionChanged(session: MilkSession) {
         if (session == _selectedSession.value) return
         _selectedSession.value = session
-        loadEntries()
+        // Reset touched set — user's edits belonged to the previous session.
+        touchedAnimals.clear()
     }
 
     fun onQuantityChanged(animalId: String, value: String) {
         val sanitized = value.filter { it.isDigit() || it == '.' }.take(5)
+        touchedAnimals += animalId
         _quantityInputs.value = _quantityInputs.value + (animalId to sanitized)
     }
 
@@ -169,7 +178,8 @@ class MilkViewModel @Inject constructor(
         _isSaving.value = true
 
         viewModelScope.launch {
-            val inputs = _entries.value.map { entry ->
+            val entries = uiState.value.entries
+            val inputs = entries.map { entry ->
                 BulkEntryInput(
                     animalId = entry.animalId,
                     quantityLiters = _quantityInputs.value[entry.animalId]?.toDoubleOrNull(),
@@ -181,9 +191,8 @@ class MilkViewModel @Inject constructor(
                 farmId, _selectedDate.value, _selectedSession.value, inputs
             ).onSuccess { count ->
                 _isSaving.value = false
+                touchedAnimals.clear()   // saved values are now canonical
                 _events.send(MilkEvent.Saved(count))
-                // Refresh in case Room's Flow doesn't tick fast enough for the confirmation
-                loadEntries()
             }.onFailure { e ->
                 _isSaving.value = false
                 _events.send(MilkEvent.ShowError(e.message ?: "Could not save"))

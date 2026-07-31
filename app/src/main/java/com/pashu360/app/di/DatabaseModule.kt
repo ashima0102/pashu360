@@ -9,6 +9,7 @@ import com.pashu360.app.feature.health.data.local.HealthRecordDao
 import com.pashu360.app.feature.health.data.local.VaccinationDao
 import com.pashu360.app.feature.health.data.local.VetContactDao
 import com.pashu360.app.feature.milk.data.local.MilkRecordDao
+import com.pashu360.app.feature.notifications.data.local.AlertDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,4 +46,7 @@ object DatabaseModule {
     @Provides
     fun provideFinancialRecordDao(db: AppDatabase): FinancialRecordDao =
         db.financialRecordDao()
+
+    @Provides
+    fun provideAlertDao(db: AppDatabase): AlertDao = db.alertDao()
 }

@@ -42,6 +42,7 @@ import com.pashu360.app.feature.animal.presentation.AnimalDetailScreen
 import com.pashu360.app.feature.animal.presentation.AnimalListScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
+import com.pashu360.app.feature.milk.presentation.MilkScreen
 import kotlinx.coroutines.launch
 
 data class BottomNavItem(
@@ -157,10 +158,10 @@ fun MainScaffold(
                 }
 
                 composable(Screen.Milk.route) {
-                    ComingSoonScreen(
-                        title = "Milk Production",
-                        subtitle = "Log morning + evening milk for your entire herd, weekly analytics, lactation tracking, and quality grading. Building next in PR #3.",
-                        icon = Icons.Filled.LocalDrink
+                    MilkScreen(
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 

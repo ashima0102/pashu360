@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.pashu360.app.core.data.local.AppDatabase
 import com.pashu360.app.feature.animal.data.local.AnimalDao
+import com.pashu360.app.feature.milk.data.local.MilkRecordDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +25,7 @@ object DatabaseModule {
 
     @Provides
     fun provideAnimalDao(db: AppDatabase): AnimalDao = db.animalDao()
+
+    @Provides
+    fun provideMilkRecordDao(db: AppDatabase): MilkRecordDao = db.milkRecordDao()
 }

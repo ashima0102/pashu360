@@ -2,7 +2,7 @@
 # Build tools
 agp = "9.3.1"
 kotlin = "2.2.10"
-ksp = "2.2.10-2.0.4"
+ksp = "2.2.10-2.0.2"
 
 # AndroidX
 coreKtx = "1.15.0"
@@ -13,7 +13,7 @@ navigationCompose = "2.8.4"
 lifecycleViewmodelCompose = "2.8.7"
 
 # Hilt (Dependency Injection)
-hilt = "2.52"
+hilt = "2.60.1"
 hiltNavigation = "1.2.0"
 hiltWork = "1.2.0"
 
@@ -31,7 +31,7 @@ kotlinxSerialization = "1.7.3"
 kotlinxDatetime = "0.6.1"
 
 # Supabase (Backend)
-supabase = "3.0.0"
+supabase = "3.7.0"
 ktor = "3.0.1"
 
 # DataStore (Preferences)

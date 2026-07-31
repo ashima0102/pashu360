@@ -14,14 +14,15 @@ interface MilkRepository {
     fun observeWeeklyTotals(farmId: String, endDate: LocalDate): Flow<List<DailyMilkTotal>>
 
     /**
-     * Builds the bulk entry list: every active animal, pre-filled with today's
-     * existing record for the given session if one exists.
+     * Reactively builds the bulk entry list: every active animal, pre-filled
+     * with today's existing record for the given session if one exists.
+     * Emits again whenever animals or milk records for that day change.
      */
-    suspend fun buildBulkEntry(
+    fun observeBulkEntry(
         farmId: String,
         date: LocalDate,
         session: MilkSession
-    ): List<BulkMilkEntry>
+    ): Flow<List<BulkMilkEntry>>
 
     suspend fun saveBulkEntry(
         farmId: String,

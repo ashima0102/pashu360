@@ -11,6 +11,7 @@ import com.pashu360.app.feature.milk.domain.repository.BulkEntryInput
 import com.pashu360.app.feature.milk.domain.repository.MilkRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -59,29 +60,33 @@ class MilkRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun buildBulkEntry(
+    override fun observeBulkEntry(
         farmId: String,
         date: LocalDate,
         session: MilkSession
-    ): List<BulkMilkEntry> = withContext(Dispatchers.IO) {
-        val existing = milkDao.getSessionRecords(farmId, date.toString(), session.value)
-            .associateBy { it.animalId }
+    ): Flow<List<BulkMilkEntry>> {
+        // Reactively combine active animals + this session's records; re-emit
+        // whenever either changes so newly added animals show up automatically.
+        val animalsFlow = animalDao.observeActiveAnimals(farmId)
+        val recordsFlow = milkDao.observeRecordsForDate(farmId, date.toString())
 
-        // We need active animals only. Reuse animal DAO via a blocking call
-        // (we're already off the main thread via withContext).
-        val animals = animalDao.observeActiveAnimals(farmId).first()
+        return combine(animalsFlow, recordsFlow) { animals, records ->
+            val existingForSession = records
+                .filter { it.session == session.value }
+                .associateBy { it.animalId }
 
-        animals.map { a ->
-            val existingRec = existing[a.id]
-            BulkMilkEntry(
-                animalId = a.id,
-                tagId = a.tagId,
-                animalName = a.name,
-                breed = a.breed,
-                existingQuantity = existingRec?.quantityLiters,
-                existingFat = existingRec?.fatPct,
-                existingSnf = existingRec?.snfPct
-            )
+            animals.map { a ->
+                val existingRec = existingForSession[a.id]
+                BulkMilkEntry(
+                    animalId = a.id,
+                    tagId = a.tagId,
+                    animalName = a.name,
+                    breed = a.breed,
+                    existingQuantity = existingRec?.quantityLiters,
+                    existingFat = existingRec?.fatPct,
+                    existingSnf = existingRec?.snfPct
+                )
+            }
         }
     }
 

@@ -5,7 +5,7 @@
 **Priority:** P1 = MVP Critical | P2 = MVP Important | P3 = Phase 2  
 **Status:** ✅ Done · 🟡 UI built (backend pending Supabase) · ⬜ Not Started
 
-**Last updated:** 2026-08-01
+**Last updated:** 2026-08-02
 
 ## Progress Summary
 
@@ -14,19 +14,19 @@
 | Authentication (UI + navigation) | 7 | 7 | 🟡 100% UI · Supabase backend pending |
 | Farm Management | 1 | 5 | 🟡 20% (Farm Setup screen only) |
 | Animal Management | 14 | 14 | ✅ 100% |
-| Milk Production | 0 | 12 | ⬜ 0% |
+| Milk Production | 9 | 12 | ✅ 75% |
 | Feeding | 0 | 8 | ⬜ 0% |
-| Health | 0 | 10 | ⬜ 0% |
-| Vaccination | 0 | 10 | ⬜ 0% |
+| Health | 3 | 10 | 🟡 30% (read side) |
+| Vaccination | 4 | 10 | 🟡 40% (list + overdue detection) |
 | Heat Cycle | 0 | 5 | ⬜ 0% |
 | Breeding | 0 | 5 | ⬜ 0% |
 | Pregnancy & Calving | 0 | 6 | ⬜ 0% |
-| Financial | 0 | 7 | ⬜ 0% |
+| Financial | 7 | 7 | ✅ 100% |
 | Reports | 0 | 6 | ⬜ 0% |
-| Notifications | 0 | 5 | ⬜ 0% |
-| Offline & Sync | 0 | 4 | ⬜ 0% (Phase 5) |
+| Notifications | 4 | 5 | ✅ 80% (WorkManager + inbox + bell badge) |
+| Offline & Sync | 3 | 4 | 🟡 Room done; Supabase sync pending |
 | Settings | 0 | 5 | ⬜ 0% |
-| **TOTAL** | **22** | **109** | **20%** |
+| **TOTAL** | **52** | **109** | **48%** |
 
 ---
 
@@ -77,22 +77,24 @@
 
 ---
 
-## Milk Production
+## Milk Production ✅ Phase 2 Complete
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-ML01 | Log morning milk for all my cows in one screen | P1 | Bulk entry, all cows visible |
-| US-ML02 | Log evening milk for all my cows in one screen | P1 | Session toggle between AM/PM |
-| US-ML03 | See how much milk my farm produced today | P1 | Dashboard total updated |
-| US-ML04 | See milk trend for the past 7 days as a chart | P1 | Bar chart on milk history screen |
-| US-ML05 | See milk trend for the past 30 days | P1 | Line chart on analytics screen |
-| US-ML06 | Know which cow produced the most milk this month | P1 | Top producers section |
-| US-ML07 | Log milk fat% and SNF% (optional) | P2 | Optional toggle fields |
-| US-ML08 | See the lactation history of each cow | P2 | Lactation records on Milk tab |
-| US-ML09 | See a 305-day lactation curve per cow | P2 | Chart on analytics |
-| US-ML10 | Compare this month's production to last month | P2 | Monthly comparison chart |
-| US-ML11 | Skip a cow during milk entry if she wasn't milked | P1 | Blank entry = no record |
-| US-ML12 | Correct a milk entry I made with wrong quantity | P1 | Long-press or edit on history |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-ML01 | Log morning milk for all my cows in one screen | P1 | ✅ Done | Bulk entry sheet, reactive animal list |
+| US-ML02 | Log evening milk for all my cows in one screen | P1 | ✅ Done | Session toggle Morning/Evening |
+| US-ML03 | See how much milk my farm produced today | P1 | ✅ Done | Today's Total KPI on Milk tab |
+| US-ML04 | See milk trend for the past 7 days as a chart | P1 | ✅ Done | 7-day bar chart |
+| US-ML05 | See milk trend for the past 30 days | P1 | ⬜ | Line chart pending — 7-day chart implemented |
+| US-ML06 | Know which cow produced the most milk this month | P1 | ⬜ | Top producers section pending |
+| US-ML07 | Log milk fat% and SNF% (optional) | P2 | ✅ Done | Toggle-revealed fat/SNF fields |
+| US-ML08 | See the lactation history of each cow | P2 | ⬜ | |
+| US-ML09 | See a 305-day lactation curve per cow | P2 | ⬜ | |
+| US-ML10 | Compare this month's production to last month | P2 | ⬜ | |
+| US-ML11 | Skip a cow during milk entry if she wasn't milked | P1 | ✅ Done | Blank/zero quantity is filtered out on save |
+| US-ML12 | Correct a milk entry I made with wrong quantity | P1 | ✅ Done | Re-open sheet pre-fills existing values; save overwrites |
+| — | (bonus) Log milk for one animal from its detail | P1 | ✅ Done | Log Milk quick-action on Animal Detail |
+| — | (bonus) Milk quality grading A+/A/B (FSSAI) | P2 | ✅ Done | Computed from fat% + SNF% on MilkRecord.qualityGrade |
 
 ---
 
@@ -111,37 +113,38 @@
 
 ---
 
-## Health Management
+## Health Management 🟡 Phase 3 (read side)
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-HL01 | Record a health checkup for a cow | P1 | Temperature, pulse, BCS saved |
-| US-HL02 | Log symptoms when a cow is sick | P1 | Multi-select symptom tags |
-| US-HL03 | Record what medicine I gave and the dose | P1 | Medicine record with withdrawal date |
-| US-HL04 | Know when a medicine's withdrawal period ends | P1 | Alert before selling milk from treated cow |
-| US-HL05 | Log a vet visit with cost | P2 | Vet visit record |
-| US-HL06 | Track my cow's weight over time | P2 | Weight chart on Health tab |
-| US-HL07 | See which animals are currently sick | P1 | Sick animals on dashboard |
-| US-HL08 | See the full health history of an animal | P1 | Timeline on Health tab |
-| US-HL09 | Record body condition score of an animal | P2 | BCS slider (1–5) |
-| US-HL10 | Take a photo of an injury or skin condition | P2 | Photo attachment on health event |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-HL01 | Record a health checkup for a cow | P1 | 🟡 Data model + read UI ready | Add-form wiring in Phase 6 |
+| US-HL02 | Log symptoms when a cow is sick | P1 | 🟡 SymptomCatalog (13 tags) + Room ready | Add-form wiring in Phase 6 |
+| US-HL03 | Record what medicine I gave and the dose | P1 | 🟡 Data model ready | Add-form wiring in Phase 6 |
+| US-HL04 | Know when a medicine's withdrawal period ends | P1 | ⬜ | Withdrawal warning UI pending |
+| US-HL05 | Log a vet visit with cost | P2 | 🟡 Data model ready | Add-form pending |
+| US-HL06 | Track my cow's weight over time | P2 | ⬜ | Weight tracking pending |
+| US-HL07 | See which animals are currently sick | P1 | ✅ Done | Active Issues chip on Health tab header |
+| US-HL08 | See the full health history of an animal | P1 | ✅ Done | Records list on Health tab |
+| US-HL09 | Record body condition score of an animal | P2 | ⬜ | BCS field exists on model — form pending |
+| US-HL10 | Take a photo of an injury or skin condition | P2 | ⬜ | Photo upload pending |
+| — | (bonus) Vet phone book with call button | P2 | ✅ Done | Vet Contacts tab |
 
 ---
 
-## Vaccination Management
+## Vaccination Management 🟡 Phase 3 (read side)
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-VC01 | Record a vaccination I gave to a cow | P1 | Vaccination saved with next due date |
-| US-VC02 | Know the next vaccination due date for each cow | P1 | Next due shown on Vaccination tab |
-| US-VC03 | Get notified 3 days before a vaccination is due | P1 | FCM push notification sent |
-| US-VC04 | Get notified on the day a vaccination is due | P1 | Day-of FCM notification |
-| US-VC05 | See all upcoming vaccinations in a calendar | P1 | Calendar view with colored dots |
-| US-VC06 | See overdue vaccinations highlighted | P1 | Red color for overdue |
-| US-VC07 | Vaccinate multiple cows at once (batch) | P2 | Multi-select animals on add form |
-| US-VC08 | Add a custom vaccine to my catalogue | P2 | Add to vaccine catalogue |
-| US-VC09 | See vaccination history for each animal | P1 | List on Vaccination tab |
-| US-VC10 | Record who administered the vaccine | P2 | Administered by field |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-VC01 | Record a vaccination I gave to a cow | P1 | 🟡 Data model + repo ready | Add-form wiring in Phase 6 |
+| US-VC02 | Know the next vaccination due date for each cow | P1 | ✅ Done | Next Due column on Vaccination tab |
+| US-VC03 | Get notified 3 days before a vaccination is due | P1 | ✅ Done | AlertScannerWorker 3-day window |
+| US-VC04 | Get notified on the day a vaccination is due | P1 | ✅ Done | Local notification via NotificationHelper |
+| US-VC05 | See all upcoming vaccinations in a calendar | P1 | ⬜ | List view built; calendar view pending |
+| US-VC06 | See overdue vaccinations highlighted | P1 | ✅ Done | OVERDUE / DUE TODAY badges |
+| US-VC07 | Vaccinate multiple cows at once (batch) | P2 | ⬜ | |
+| US-VC08 | Add a custom vaccine to my catalogue | P2 | ⬜ | 8 default vaccines already in `VaccineCatalog` |
+| US-VC09 | See vaccination history for each animal | P1 | ✅ Done | Vaccinations tab list |
+| US-VC10 | Record who administered the vaccine | P2 | 🟡 Field exists on model | Add-form pending |
 
 ---
 
@@ -182,17 +185,17 @@
 
 ---
 
-## Financial Management
+## Financial Management ✅ Phase 4 Complete
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-FN01 | Record how much milk I sold today and at what price | P3 | Income record created |
-| US-FN02 | See my farm's net profit this month | P3 | P&L dashboard |
-| US-FN03 | Know which cow is most profitable | P3 | Per-animal P&L |
-| US-FN04 | Record feed expenses | P3 | Expense record |
-| US-FN05 | Record medicine expenses | P3 | Expense linked to health record |
-| US-FN06 | Record labor and other expenses | P3 | Expense categories |
-| US-FN07 | Export a financial report for my accountant | P3 | PDF export |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-FN01 | Record how much milk I sold today and at what price | P3 | ✅ Done | Milk Sale category with amount + counterparty |
+| US-FN02 | See my farm's net profit this month | P3 | ✅ Done | Net Profit hero card + 6-month monthly chart |
+| US-FN03 | Know which cow is most profitable | P3 | 🟡 animal_id foreign key exists | Per-animal P&L UI pending |
+| US-FN04 | Record feed expenses | P3 | ✅ Done | Feed category |
+| US-FN05 | Record medicine expenses | P3 | ✅ Done | Medicine + Vet Fees categories |
+| US-FN06 | Record labor and other expenses | P3 | ✅ Done | Labour + Equipment + Other categories |
+| US-FN07 | Export a financial report for my accountant | P3 | ⬜ | PDF export in Phase 8 |
 
 ---
 
@@ -209,15 +212,17 @@
 
 ---
 
-## Notifications
+## Notifications ✅ Phase 5 Complete
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-NT01 | See all my farm alerts in one place | P1 | Notification Center screen |
-| US-NT02 | Mark an alert as done | P1 | Alert removed from list |
-| US-NT03 | Tap a notification to go to the right screen | P1 | Deep-link navigation |
-| US-NT04 | Choose which alert types I receive | P2 | Notification settings |
-| US-NT05 | Choose what time alerts are sent to me | P2 | Configurable notification time |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-NT01 | See all my farm alerts in one place | P1 | ✅ Done | AlertsScreen inbox with filter chips |
+| US-NT02 | Mark an alert as done | P1 | ✅ Done | Mark Done button per card |
+| US-NT03 | Tap a notification to go to the right screen | P1 | ✅ Done | Deep link `pashu360://animal/{id}` |
+| US-NT04 | Choose which alert types I receive | P2 | ⬜ | Notification preferences screen pending |
+| US-NT05 | Choose what time alerts are sent to me | P2 | ⬜ | Currently fires 3-day window + on due date via WorkManager |
+| — | (bonus) Live bell badge count on all tabs | P2 | ✅ Done | AlertBadgeViewModel |
+| — | (bonus) Auto-cleanup of resolved alerts > 90 days | P2 | ✅ Done | AlertScannerWorker.cleanupOldResolved |
 
 ---
 

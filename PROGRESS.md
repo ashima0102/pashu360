@@ -1,24 +1,27 @@
 # Pashu360 — Progress Tracker
 
 > Live tracking of what's built vs what's planned.
-> Updated: **2026-08-01**
+> Updated: **2026-08-02**
 
 ---
 
 ## Overall Status
 
-| Phase | Status | Progress | Target |
-|---|---|---|---|
-| **Phase 0** — Foundation & Auth Shell | ✅ Done | 100% | Week 1–2 |
-| **Phase 1** — Animal Management | ✅ Done | 100% | Week 3–4 |
-| **Phase 2** — Milk Production | ⬜ Not started | 0% | Week 5 |
-| **Phase 3** — Vaccination + Alerts | ⬜ Not started | 0% | Week 6–7 |
-| **Phase 4** — Health + Feeding | ⬜ Not started | 0% | Week 8–9 |
-| **Phase 5** — Offline Sync (Supabase) | ⬜ Not started | 0% | Week 10 |
-| **Phase 6** — Finance + Reports | ⬜ Not started | 0% | Week 11–12 |
-| **Phase 7** — Localization + Polish | ⬜ Not started | 0% | Week 13–14 |
+| Phase | Status | Progress |
+|---|---|---|
+| **Phase 0** — Foundation & Auth Shell | ✅ Done | 100% |
+| **Phase 1** — Animal Management | ✅ Done | 100% |
+| **Phase 2** — Milk Production | ✅ Done | 100% |
+| **Phase 3** — Health Management (records + vaccinations + vet contacts) | ✅ Done (read side) | 90% |
+| **Phase 4** — Finance Management | ✅ Done | 100% |
+| **Phase 5** — Alerts + Local Notifications (WorkManager) | ✅ Done | 100% |
+| **Phase 6** — Add-forms wiring + alert scheduler triggers | ⬜ Not started | 0% |
+| **Phase 7** — Feeding + Breeding + Pregnancy | ⬜ Not started | 0% |
+| **Phase 8** — Reports + PDF/CSV export | ⬜ Not started | 0% |
+| **Phase 9** — Offline sync with Supabase | ⬜ Not started | 0% |
+| **Phase 10** — Localization + polish + Play Store | ⬜ Not started | 0% |
 
-**Total progress: 2 of 8 phases complete (25%)**
+**5 of 10 phases complete (~50%)** — the whole core-tracking loop (animals → milk → health → finance → alerts) is live locally.
 
 ---
 
@@ -26,51 +29,15 @@
 
 **Completed:** 2026-07-31
 
-### What Was Built
+- Android Studio project with Kotlin + Jetpack Compose
+- Gradle 9.5, Kotlin 2.4.10, KSP 2.3.10, AGP 9.3.1
+- Clean Architecture folder tree, MVVM + Hilt DI
+- Material 3 theme (forest green / amber)
+- Root NavHost, 5-tab bottom nav shell
+- 6 auth screens (Splash, Login, OTP, Register, Farm Setup) + Dashboard shell
 
-#### Project Setup
-- ✅ Android Studio project created (Kotlin + Jetpack Compose)
-- ✅ Gradle 9.5.0 with Kotlin DSL + version catalog
-- ✅ Kotlin 2.4.10 + AGP 9.3.1
-- ✅ Min SDK 26, Target SDK 37
-- ✅ 30+ production dependencies configured
-
-#### Dependencies Wired
-- ✅ Jetpack Compose + Material 3
-- ✅ Hilt DI (2.60.1)
-- ✅ Room Database (2.6.1)
-- ✅ WorkManager (2.10.0)
-- ✅ Coroutines + Flow
-- ✅ Kotlin Serialization + Datetime
-- ✅ Supabase Kotlin SDK (3.7.0)
-- ✅ Coil (image loading)
-- ✅ Vico (charts)
-- ✅ CameraX + ML Kit (QR scanning)
-- ✅ Compose Navigation
-- ✅ DataStore + EncryptedSharedPreferences
-
-#### Architecture
-- ✅ Clean Architecture folder structure (`core/`, `feature/`, `di/`)
-- ✅ MVVM pattern with ViewModel + StateFlow
-- ✅ Material 3 Pashu360 theme (forest green + amber palette)
-- ✅ Light + Dark mode support
-- ✅ Application class (`Pashu360App.kt`) with FCM notification channels
-- ✅ AndroidManifest with permissions and deep linking
-- ✅ Root NavHost with auth + main graphs
-- ✅ 5-tab bottom navigation shell
-
-#### Screens Built (5 auth screens + 1 dashboard)
-- ✅ **Screen 1** — Splash (animated logo, green gradient)
-- ✅ **Screen 2** — Login (phone OTP + email toggle)
-- ✅ **Screen 3** — OTP Verification (6 boxes + resend timer)
-- ✅ **Screen 4** — Register (name + phone + email + password)
-- ✅ **Screen 5** — Farm Setup (farm name, location, animal count)
-- ✅ **Screen 6** — Dashboard (KPI card, quick actions, alerts)
-
-### Files Created (Phase 0)
-- 26 Kotlin files (theme, navigation, auth, dashboard)
-- 1 build config (`libs.versions.toml`, `build.gradle.kts`)
-- 1 AndroidManifest with permissions
+Notable early fixes: KSP2 codegen bug workaround (non-suspend DAO methods),
+Kotlin 2.4 stdlib migration (`kotlin.time.Clock`), Room 2.6 API fixes.
 
 ---
 
@@ -78,135 +45,161 @@
 
 **Completed:** 2026-08-01
 
-### What Was Built
-
-#### Domain Layer
-- ✅ `Animal` domain model (with age calculation)
-- ✅ `Gender`, `AnimalStatus`, `AnimalFilter` enums
-- ✅ `BreedCatalog` (13 Indian dairy breeds: HF, Jersey, Sahiwal, Gir, etc.)
-
-#### Data Layer (Room)
-- ✅ `AnimalEntity` with indices for farm+status queries
-- ✅ `AnimalDao` with Flow-based reactive queries + search
-- ✅ `AppDatabase` (v1) with schema export enabled
-- ✅ `AnimalRepositoryImpl` mapping entity ↔ domain
-
-#### Use Cases
-- ✅ `GetAnimalsUseCase` (with filter)
-- ✅ `GetAnimalByIdUseCase`
-- ✅ `SearchAnimalsUseCase`
-- ✅ `AddAnimalUseCase` (with tag uniqueness + weight validation)
-- ✅ `UpdateAnimalUseCase`
-- ✅ `GetAnimalByQrUseCase`
-- ✅ `GetAnimalStatsUseCase` (counts)
-
-#### Dependency Injection
-- ✅ `DatabaseModule` (Room + DAO providers)
-- ✅ `RepositoryModule` (@Binds AnimalRepository)
-- ✅ `SessionStore` (active farm ID; uses demo farm until Supabase auth)
-
-#### Screens Built (4 animal screens)
-- ✅ **Screen 7** — Animal List
-  - Gradient header with search bar
-  - QR scan icon in top-right
-  - Horizontal filter chips (All/Active/Pregnant/Sick/Dry/Sold)
-  - Animal cards with avatar, tag, breed, age, status badge
-  - Empty state prompt
-  - Extended FAB
-- ✅ **Screen 8** — QR Scanner
-  - CameraX full-screen preview
-  - ML Kit barcode detection (QR, Code 128, EAN-13)
-  - Runtime CAMERA permission
-  - Auto-navigation on scan
-- ✅ **Screen 9** — Add Animal
-  - Auto-generated Tag ID (editable)
-  - Breed dropdown (13 breeds)
-  - Gender toggle chips
-  - Material 3 date picker for DOB
-  - Weight + purchase price validation
-  - Save to Room + toast confirmation
-- ✅ **Screen 10** — Animal Profile
-  - Gradient header with avatar, tag, status
-  - Quick action buttons (Milk, Vaccine, Health)
-  - Scrollable tab row (6 tabs)
-  - Overview tab fully built
-  - Other tabs: placeholder "coming next phase"
-
-#### Navigation
-- ✅ `MainScaffold` with 5-tab bottom navigation
-- ✅ Bottom nav auto-hides on detail screens
-- ✅ Coming Soon placeholders for Milk/Alerts/More
-
-### Files Created (Phase 1)
-- 21 Kotlin files (2,358 lines of code)
+- Animal domain + Room entity + DAO (Room v1)
+- AnimalRepository with Flow reads + IO-dispatched writes
+- AnimalListScreen with search / filter chips / cards / FAB
+- AddAnimalScreen with breed dropdown, gender toggle, DOB picker
+- AnimalDetailScreen with 6 tabs (Overview built; others placeholder)
+- QrScannerScreen using CameraX + ML Kit
+- MainScaffold bottom nav shell
 
 ---
 
-## Phase 2 — Milk Production ⬜ (Next)
+## Phase 2 — Milk Production ✅
 
-**Target:** Week 5
+**Completed:** 2026-08-01 · merged 2026-08-02 (PR #7)
 
-Planned features (not built yet):
-- Bulk milk entry screen (all cows, morning/evening)
-- Milk history per animal (7-day bar chart)
-- Herd-level analytics screen (30-day line chart, top producers)
-- Wire "Today's Milk" into dashboard KPI card
-- Fat% / SNF% optional fields
+### Domain
+- `MilkRecord`, `MilkSession` (Morning/Evening), `MilkGrade` (A+/A/B), `BulkMilkEntry`, `DailyMilkTotal`
+- Quality grading from Indian FSSAI fat% + SNF% thresholds
 
----
+### Data (Room v2)
+- MilkRecordEntity with unique `(animal, date, session)` and CASCADE FK to Animals
+- MilkRecordDao with reactive Flow + weekly aggregation SQL
 
-## Phase 3 — Vaccination + Alerts ⬜
-
-Planned features:
-- Vaccination schedule (calendar + list view)
-- Add vaccination record
-- Vaccine catalogue (8 default Indian vaccines)
-- FCM push notifications (3 days before + day of)
-- Notification Center screen
+### Presentation
+- MilkScreen with today's KPI, 7-day bar chart, session breakdown
+- Bulk milk entry bottom sheet (reactively re-emits when animals are added)
+- Per-animal milk entry sheet from Animal Detail (Log Milk header button)
 
 ---
 
-## Phase 4 — Health + Feeding ⬜
+## Phase 3 — Health Management ✅ (read side)
 
-Planned features:
-- Log health event (symptoms, disease, medicine, vet visit)
-- Weight tracking with trend chart
-- Feed logging + inventory
-- Low-stock alerts
+**Completed:** 2026-08-01 · merged 2026-08-02 (PR #7)
+
+### Domain
+- `HealthRecord` (checkup / disease / injury / vet visit), severity, symptoms
+- `Vaccination` with `isOverdue()` / `isDueSoon()` helpers
+- `VetContact` (name, phone, specialty, clinic)
+- `SymptomCatalog` (13 Indian symptoms) + `VaccineCatalog` (8 default vaccines)
+
+### Data (Room v3)
+- 3 new entities with CASCADE FK to Animals
+- Pipe-delimited symptom serialization
+- Overdue + due-soon count queries
+
+### Presentation
+- HealthScreen with 3 tabs: **Records | Vaccinations | Vet Contacts**
+- 3 summary chips in header (Overdue / Due Soon / Active Issues)
+- Cards with severity color strip, overdue badges
+- Empty states + contextual FAB per tab
+
+### ⏳ Follow-up (Phase 6)
+- Add-record / Add-vaccination / Add-contact bottom sheets still show a "coming next" toast
 
 ---
 
-## Phase 5 — Supabase Sync ⬜
+## Phase 4 — Finance Management ✅
+
+**Completed:** 2026-08-01 · merged 2026-08-02 (PR #7)
+
+### Domain
+- `FinancialRecord`, 11 categories (Milk Sale, Feed, Medicine, etc.)
+- `MonthlyPnL`, `CategoryBreakdown`
+
+### Data (Room v4)
+- FinancialRecordEntity + indexed queries
+- SQL `GROUP BY substr(record_date, ...)` for monthly buckets
+
+### Presentation
+- FinanceScreen with Net Profit hero, monthly bar chart, expense breakdown, transactions list
+- Add Transaction bottom sheet with Income/Expense toggle, category chips
+- ₹ Indian comma formatting
+
+---
+
+## Phase 5 — Alerts + Local Notifications ✅
+
+**Completed:** 2026-08-02 · merged 2026-08-02 (PR #7)
+
+### Domain
+- `Alert` with type / priority / urgency helpers
+- `AlertType` — 6 types with per-type notification channels
+- `AlertFilter` for tab filtering
+
+### Data (Room v5)
+- AlertEntity with indexes + dedupe helpers (`getBySourceId`, `getByAnimalTypeAndDate`)
+- Atomic `getPendingNotifications + markNotified`
+- Auto-cleanup of resolved alerts > 90 days
+
+### WorkManager
+- `AlertScannerWorker` (@HiltWorker) periodic every 6 hours + one-shot
+- `Pashu360App` implements `Configuration.Provider` with HiltWorkerFactory
+- Manifest disables default `WorkManagerInitializer`
+- Scans vaccinations with `next_due_date` within 3-day window and creates alerts
+
+### Notifications
+- `NotificationHelper` builds NotificationCompat.Builder with deep links (`pashu360://animal/{id}`)
+- Uses per-type channels already registered in Pashu360App
+
+### UI
+- AlertsScreen replaces placeholder: filter chips, urgency-colored cards, Mark Done
+- Live bell badge count via `AlertBadgeViewModel` on all 5 top-level tabs
+
+### ⏳ Follow-up (Phase 6)
+- Add-vaccination sheet needs to call `AlertScheduler.scanNow()` after saving
+- Heat + calving scanners still to be written
+
+---
+
+## Phase 6 — Add-forms wiring + alert scheduler triggers ⬜ (Next)
 
 Planned:
-- Supabase project setup
-- Database migrations
-- RLS policies
-- Real authentication (replace demo session)
-- WorkManager sync engine
-- Realtime data streaming
+- Add Vaccination bottom sheet in Health screen (calls `AlertScheduler.scanNow()` after save)
+- Add Health Event bottom sheet with symptom multi-select
+- Add Vet Contact form
+- Verify overdue chip on Health screen updates from real data
+- Verify bell badge lights up after adding a due-soon vaccine
 
 ---
 
-## Phase 6 — Finance + Reports ⬜
+## Phase 7 — Feeding + Breeding + Pregnancy ⬜
 
-Planned:
-- Income + expense logging
-- Per-animal P&L
-- Farm-level P&L dashboard
-- PDF export via iTextPDF
-- CSV export
+Planned (drawer destinations):
+- Feed log + inventory + low-stock alerts
+- Heat calendar + AI record + conception status
+- Pregnancy timeline + expected calving alerts
 
 ---
 
-## Phase 7 — Localization + Polish ⬜
+## Phase 8 — Reports + PDF/CSV export ⬜
 
 Planned:
-- Hindi language pack
-- Odia language pack
+- Milk production report (per-animal + herd)
+- Vaccination compliance report
+- Financial P&L PDF
+- CSV export for accountants
+
+---
+
+## Phase 9 — Supabase cloud sync ⬜
+
+Planned:
+- Supabase project + RLS policies
+- Real auth (replace SessionStore's demo farm)
+- Sync engine writing local Room mutations to remote
+- Realtime pull
+
+---
+
+## Phase 10 — Localization + polish + Play Store ⬜
+
+Planned:
+- Hindi + Odia strings
 - Onboarding tutorial
-- Compose animations polish
-- Play Store beta release
+- Compose animation polish
+- Play Store beta
 
 ---
 
@@ -214,31 +207,18 @@ Planned:
 
 | Metric | Count |
 |---|---|
-| Total files created | 47 Kotlin files |
-| Total lines of code | ~4,000 |
-| Screens built | 10 of 32 (31%) |
-| Modules complete | 2 of 8 (25%) |
-| Git commits | 10 |
-| Documentation files | 30 planning docs |
+| Total Kotlin files | ~80 |
+| Total lines of code | ~10,000 |
+| Screens built (functional) | 15+ of 32 (~47%) |
+| Modules complete | 5 of 10 (50%) |
+| Room DB version | 5 |
+| Git commits on main | 40+ |
+| Merged PRs | 7 |
 
 ---
 
-## Documentation Structure
+## Repository
 
-```
-docs/                            (planning — 30 docs)
-├── 01_PRD.md
-├── 02_SRS.md
-├── 03_UserStories.md            ← updated with ✅ done markers
-├── 04_FunctionalRequirements.md ← updated with implementation status
-├── ...
-└── 30_FutureRoadmap.md
-
-PROGRESS.md          (this file — live progress tracker)
-CHANGELOG.md         (chronological release notes)
-README.md            (getting started)
-```
-
----
-
-*Last commit: `3c55558 Phase 1: Animal Management (Screens 7-10)`*
+- **GitHub:** https://github.com/ashima0102/pashu360
+- **Default branch:** `main` (branch-protected, PR-only)
+- **Latest commit:** `d59adca` — Merge PR #7 (all remaining phases)

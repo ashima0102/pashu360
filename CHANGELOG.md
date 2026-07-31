@@ -5,13 +5,142 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased] — Phase 2 (In Progress)
+## [Unreleased] — Phase 6 (Next)
 
 ### Planned
-- Bulk milk entry screen (morning/evening for all animals)
-- Milk history + charts per animal
-- Herd-level analytics
-- Dashboard "Today's Milk" wired to real data
+- Add Vaccination bottom sheet → wired to `AlertScheduler.scanNow()`
+- Add Health Event sheet with symptom multi-select
+- Add Vet Contact form
+- Heat + calving alert scanners in AlertScannerWorker
+
+---
+
+## [0.6.0] — 2026-08-02 · Phase 5 — Alerts + WorkManager ✅
+
+Full offline alerts system. Background WorkManager job scans vaccinations,
+generates Alert entities in Room, and fires system notifications. Header
+bell badge live across all top-level screens.
+
+### Added
+- `Alert` domain model with urgency computation (Overdue / Today / Soon / Upcoming)
+- `AlertType` enum with 6 types, each mapped to a notification channel
+- Room v5 — `AlertEntity` + `AlertDao` with dedupe helpers + auto-cleanup
+- `AlertRepository` with 8 methods including `insertOrIgnore`
+- `AlertScannerWorker` (@HiltWorker) — periodic every 6 hours + one-shot
+- `NotificationHelper` — builds NotificationCompat with deep-links (`pashu360://animal/{id}`)
+- `Pashu360App` now implements `Configuration.Provider` + schedules periodic worker
+- Manifest disables default `WorkManagerInitializer`
+- `AlertsScreen` — filter chips, urgency-colored cards, Mark Done button
+- `AlertBadgeViewModel` — always-on VM for live bell badge count on all tabs
+
+Merged via PR #7 — commit `f320038`
+
+---
+
+## [0.5.0] — 2026-08-01 · Phase 4 — Finance Management ✅
+
+Complete offline P&L tracking with income/expense logging, monthly trend chart,
+category breakdown, and full transaction list.
+
+### Added
+- `FinancialRecord` + 11 categories with emojis
+- `MonthlyPnL` + `CategoryBreakdown` aggregation models
+- Room v4 — `FinancialRecordEntity` + indexed queries
+- SQL `GROUP BY substr(record_date, ...)` for monthly buckets
+- `FinanceRepository` with 7 methods
+- `FinanceScreen`: Net Profit hero, monthly bar chart, expense breakdown, transactions
+- Add Transaction bottom sheet with Income/Expense toggle, category chips
+- ₹ Indian comma formatting (1,25,000)
+
+Merged via PR #7 — commit `4bfd50c`
+
+---
+
+## [0.4.0] — 2026-08-01 · Phase 3 — Health Management ✅
+
+Fully offline health tracking with three sub-modules: Health Records, Vaccinations
+(with overdue detection), and Vet Contacts. Read side complete; add-forms in Phase 6.
+
+### Added
+- `HealthRecord` with event type / severity / symptoms
+- `Vaccination` with `isOverdue()` / `isDueSoon()` helpers
+- `VetContact` (name, phone, specialty, clinic)
+- `SymptomCatalog` (13 Indian symptoms) + `VaccineCatalog` (8 default vaccines)
+- Room v3 — 3 new entities with pipe-delimited symptoms + CASCADE FKs
+- `HealthRepository` with 15 methods
+- `HealthScreen` with green header + 3 summary chips (Overdue / Due Soon / Active Issues)
+- TabRow: Records / Vaccinations / Vet Contacts
+- Cards with severity color strip + medicine info
+- Vaccination cards with OVERDUE / DUE TODAY badges
+- Vet contact cards with call button
+- Contextual FAB label per tab
+- Friendly empty states
+
+Merged via PR #7 — commit `b6e6f05`
+
+---
+
+## [0.3.1] — 2026-08-01 · Milk fixes
+
+### Fixed
+- `MilkRepository.buildBulkEntry` was one-shot — new animals didn't appear in the
+  Milk sheet after being added. Replaced with `observeBulkEntry` returning a Flow
+  that combines active-animals + records reactively. `touchedAnimals` set preserves
+  in-progress typed values across re-emissions.
+
+### Added
+- `AnimalDetailViewModel` extended with milk sheet state (session, quantity, fat, snf)
+- Log Milk header quick-action on Animal Detail now opens a per-animal bottom sheet
+- Toast confirmation "✓ Logged X.X L" on save
+
+Merged via PR #7 — commits `e0df5c0` + `58f09c6`
+
+---
+
+## [0.3.0] — 2026-08-01 · Phase 2 — Milk Production ✅
+
+Full offline-first milk tracking module. Farmers can now log Morning + Evening
+milk per animal, see today's total, view a 7-day bar chart, and grade milk quality.
+
+### Added
+- `MilkRecord` with quality grading (A+ / A / B / Below / Ungraded)
+- `MilkSession` (Morning / Evening) + `BulkMilkEntry` + `DailyMilkTotal`
+- Room v2 — `MilkRecordEntity` with unique `(animal, date, session)` and CASCADE FK
+- `MilkRecordDao` with reactive Flow + weekly aggregation SQL
+- `MilkRepository` with `observeBulkEntry`, `observeWeeklyTotals`, `saveBulkEntry`
+- `MilkScreen` with green gradient header, today's KPI, 7-day bar chart, session breakdown
+- `ModalBottomSheet` for bulk entry: session toggle, per-animal row, optional fat/SNF
+- Live total across all typed quantities
+- Wired into MainScaffold
+
+Merged via PR #7 — commit `430d6e6`
+
+---
+
+## [0.2.1] — 2026-08-01 · Nav restructure + hamburger drawer
+
+### Changed
+- Bottom nav redesigned: Home / Animals / Milk / **Health** / **Finance**
+  (was: Home / Animals / Milk / Alerts / More)
+
+### Added
+- Reusable `PashuAppBar` with hamburger + title + bell badge + profile
+- `PashuDrawer` with 8 destinations + Logout
+- `MainScaffold` wraps in `ModalNavigationDrawer` (gestures only on top-level tabs)
+- All new destinations wired to Coming Soon placeholders
+- Live bell badge from `AlertBadgeViewModel` (added later in PR #6)
+
+Merged via PR #2 — commit `08a702d`
+
+---
+
+## [0.2.0] — 2026-08-01 · CONTRIBUTING workflow
+
+### Added
+- CONTRIBUTING.md — branch conventions, PR conventions, architecture rules
+- `main` branch protection enabled on GitHub (PR-only)
+
+Merged via PR #1 — commit `7e36668`
 
 ---
 

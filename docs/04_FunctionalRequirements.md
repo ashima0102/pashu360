@@ -10,20 +10,20 @@
 |---|---|---|---|
 | Authentication | 6/8 | 8 | 🟡 UI + navigation done, Supabase pending |
 | Farm Management | 1/6 | 6 | 🟡 Farm setup done |
-| Animal Management | 12/14 | 14 | ✅ Phase 1 Complete |
-| Milk Production | 0/13 | 13 | ⬜ Phase 2 |
-| Feeding | 0/8 | 8 | ⬜ Phase 4 |
-| Health | 0/9 | 9 | ⬜ Phase 4 |
-| Vaccination | 0/10 | 10 | ⬜ Phase 3 |
-| Heat Cycle | 0/5 | 5 | ⬜ Phase 4 |
-| Breeding | 0/6 | 6 | ⬜ Phase 4 |
-| Pregnancy | 0/6 | 6 | ⬜ Phase 4 |
-| Finance | 0/6 | 6 | ⬜ Phase 6 |
-| Reports | 0/7 | 7 | ⬜ Phase 6 |
-| Notifications | 0/6 | 6 | ⬜ Phase 3 |
+| Animal Management | 12/14 | 14 | ✅ Phase 1 |
+| Milk Production | 10/13 | 13 | ✅ Phase 2 |
+| Feeding | 0/8 | 8 | ⬜ |
+| Health | 3/9 | 9 | 🟡 Phase 3 (read side; add-forms in Phase 6) |
+| Vaccination | 6/10 | 10 | 🟡 Phase 3 + alerts (add-form in Phase 6) |
+| Heat Cycle | 0/5 | 5 | ⬜ |
+| Breeding | 0/6 | 6 | ⬜ |
+| Pregnancy | 0/6 | 6 | ⬜ |
+| Finance | 5/6 | 6 | ✅ Phase 4 (PDF export pending in Phase 8) |
+| Reports | 0/7 | 7 | ⬜ Phase 8 |
+| Notifications | 5/6 | 6 | ✅ Phase 5 (per-type prefs pending) |
 | Offline | 3/5 | 5 | 🟡 Room done; Supabase sync pending |
-| Settings | 0/7 | 7 | ⬜ Phase 7 |
-| **TOTAL** | **22/127** | **127** | **17%** |
+| Settings | 0/7 | 7 | ⬜ |
+| **TOTAL** | **51/127** | **127** | **40%** |
 
 ---
 
@@ -84,9 +84,9 @@
 
 ---
 
-## Milk Production Module (FR-MILK) ⬜ Phase 2
+## Milk Production Module (FR-MILK) ✅ Phase 2 Complete
 
-**Status: Not started · All 13 requirements pending**
+**Status: 10/13 done — bulk entry (AM/PM), 7-day chart, quality grading, per-animal quick sheet, dashboard total. Missing: 30-day chart, lactation curve, top-producers ranking.**
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -121,7 +121,7 @@
 
 ---
 
-## Health Management Module (FR-HLTH) ⬜ Phase 4
+## Health Management Module (FR-HLTH) 🟡 Phase 3 read side · add-forms in Phase 6
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -137,7 +137,7 @@
 
 ---
 
-## Vaccination Module (FR-VAC) ⬜ Phase 3
+## Vaccination Module (FR-VAC) 🟡 Phase 3 read side + Phase 5 alerts
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -192,7 +192,7 @@
 
 ---
 
-## Financial Module (FR-FIN) ⬜ Phase 6
+## Financial Module (FR-FIN) ✅ Phase 4 Complete
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -219,7 +219,7 @@
 
 ---
 
-## Notifications Module (FR-NOTIF) ⬜ Phase 3
+## Notifications Module (FR-NOTIF) ✅ Phase 5 Complete (WorkManager + inbox + bell badge)
 
 | ID | Requirement | Priority |
 |---|---|---|

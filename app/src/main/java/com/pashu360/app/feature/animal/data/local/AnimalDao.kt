@@ -58,18 +58,21 @@ interface AnimalDao {
     @Query("SELECT COUNT(*) FROM animals WHERE farm_id = :farmId AND status = 'pregnant'")
     fun countPregnant(farmId: String): Flow<Int>
 
+    // NOTE: Explicit Long/Int return types are required — KSP2 has a bug where
+    // suspend functions returning Unit (V in JVM bytecode) fail with
+    // "unexpected jvm signature V". See https://github.com/google/ksp/issues/2957
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(animal: AnimalEntity)
+    suspend fun insert(animal: AnimalEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(animals: List<AnimalEntity>)
+    suspend fun insertAll(animals: List<AnimalEntity>): List<Long>
 
     @Update
-    suspend fun update(animal: AnimalEntity)
+    suspend fun update(animal: AnimalEntity): Int
 
     @Query("UPDATE animals SET status = :status, updated_at = :updatedAt WHERE id = :id")
-    suspend fun updateStatus(id: String, status: String, updatedAt: String)
+    suspend fun updateStatus(id: String, status: String, updatedAt: String): Int
 
     @Query("DELETE FROM animals WHERE id = :id")
-    suspend fun delete(id: String)
+    suspend fun delete(id: String): Int
 }

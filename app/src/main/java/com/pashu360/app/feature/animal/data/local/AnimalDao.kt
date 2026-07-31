@@ -74,5 +74,5 @@ interface AnimalDao {
     suspend fun updateStatus(id: String, status: String, updatedAt: String): Int
 
     @Query("DELETE FROM animals WHERE id = :id")
-    suspend fun deleteById(id: String): Int
+    fun deleteById(id: String): Int
 }

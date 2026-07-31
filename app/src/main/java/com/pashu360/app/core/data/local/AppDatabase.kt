@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.pashu360.app.feature.animal.data.local.AnimalDao
 import com.pashu360.app.feature.animal.data.local.AnimalEntity
+import com.pashu360.app.feature.finance.data.local.FinancialRecordDao
+import com.pashu360.app.feature.finance.data.local.FinancialRecordEntity
 import com.pashu360.app.feature.health.data.local.HealthRecordDao
 import com.pashu360.app.feature.health.data.local.HealthRecordEntity
 import com.pashu360.app.feature.health.data.local.VaccinationDao
@@ -20,8 +22,9 @@ import com.pashu360.app.feature.milk.data.local.MilkRecordEntity
         HealthRecordEntity::class,
         VaccinationEntity::class,
         VetContactEntity::class,
+        FinancialRecordEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -30,6 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun healthRecordDao(): HealthRecordDao
     abstract fun vaccinationDao(): VaccinationDao
     abstract fun vetContactDao(): VetContactDao
+    abstract fun financialRecordDao(): FinancialRecordDao
 
     companion object {
         const val DATABASE_NAME = "pashu360.db"

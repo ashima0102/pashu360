@@ -63,8 +63,8 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun Pashu360Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color available on Android 12+ (extracts from wallpaper)
-    dynamicColor: Boolean = true,
+    // Disable dynamic color so our brand palette shows consistently.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

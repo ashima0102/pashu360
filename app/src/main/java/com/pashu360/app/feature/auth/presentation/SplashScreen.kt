@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,82 +24,113 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pashu360.app.core.presentation.theme.Pashu360Theme
+import com.pashu360.app.core.presentation.theme.PashuGreen
+import com.pashu360.app.core.presentation.theme.PashuGreenDark
+import com.pashu360.app.core.presentation.theme.PashuGreenLight
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
     onNavigate: (isAuthenticated: Boolean, isFirstLogin: Boolean) -> Unit
 ) {
-    var animateLogo by remember { mutableStateOf(false) }
+    var visible by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (animateLogo) 1f else 0.5f,
-        animationSpec = tween(durationMillis = 600),
+        targetValue = if (visible) 1f else 0.6f,
+        animationSpec = tween(700),
         label = "logo_scale"
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(700),
+        label = "content_alpha"
     )
 
     LaunchedEffect(Unit) {
-        animateLogo = true
-        delay(1500)
-        // TODO: Check actual auth session with SessionStore later
+        visible = true
+        delay(1600)
         onNavigate(false, false)
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(PashuGreenLight, PashuGreen, PashuGreenDark)
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.alpha(alpha)
         ) {
+            // Logo circle with soft shadow feel
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(128.dp)
                     .scale(scale)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.Pets,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(64.dp)
+                    tint = PashuGreen,
+                    modifier = Modifier.size(72.dp)
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(28.dp))
 
             Text(
                 text = "Pashu360",
-                fontSize = 36.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = Color.White,
+                letterSpacing = 0.5.sp
             )
 
+            Spacer(Modifier.height(6.dp))
+
             Text(
-                text = "Complete Dairy Farm Management",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                text = "Your Farm, Smarter",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.White.copy(alpha = 0.85f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(64.dp))
+        }
 
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
+        // Bottom tagline
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .alpha(alpha),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "पशु सेवा • Powered by Farmers",
+                fontSize = 12.sp,
+                color = Color.White.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Medium
             )
+            Spacer(Modifier.height(48.dp))
         }
     }
 }

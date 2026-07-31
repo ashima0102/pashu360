@@ -41,8 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pashu360.app.core.presentation.theme.Pashu360Theme
 
 @Composable
 fun LoginScreen(
@@ -218,5 +220,29 @@ fun LoginScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Login — Light")
+@Composable
+private fun LoginScreenPreview() {
+    Pashu360Theme(dynamicColor = false) {
+        LoginScreen(
+            onNavigateToOtp = {},
+            onNavigateToRegister = {},
+            onLoginSuccess = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Login — Dark", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun LoginScreenDarkPreview() {
+    Pashu360Theme(darkTheme = true, dynamicColor = false) {
+        LoginScreen(
+            onNavigateToOtp = {},
+            onNavigateToRegister = {},
+            onLoginSuccess = {}
+        )
     }
 }

@@ -29,8 +29,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pashu360.app.core.presentation.theme.Pashu360Theme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -100,5 +102,21 @@ fun SplashScreen(
                 modifier = Modifier.size(28.dp)
             )
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Splash — Light")
+@Composable
+private fun SplashScreenPreview() {
+    Pashu360Theme(dynamicColor = false) {
+        SplashScreen(onNavigate = { _, _ -> })
+    }
+}
+
+@Preview(showBackground = true, name = "Splash — Dark", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SplashScreenDarkPreview() {
+    Pashu360Theme(darkTheme = true, dynamicColor = false) {
+        SplashScreen(onNavigate = { _, _ -> })
     }
 }

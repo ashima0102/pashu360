@@ -67,6 +67,6 @@ class AnimalRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteAnimal(id: String): Result<Unit> = runCatching {
-        dao.delete(id)
+        dao.deleteById(id)
     }
 }

@@ -26,6 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pashu360.app.feature.notifications.presentation.AlertBadgeViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -45,6 +48,7 @@ import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
 import com.pashu360.app.feature.finance.presentation.FinanceScreen
 import com.pashu360.app.feature.health.presentation.HealthScreen
 import com.pashu360.app.feature.milk.presentation.MilkScreen
+import com.pashu360.app.feature.notifications.presentation.AlertsScreen
 import kotlinx.coroutines.launch
 
 data class BottomNavItem(
@@ -56,8 +60,11 @@ data class BottomNavItem(
 @Composable
 fun MainScaffold(
     rootNavController: NavController,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    badgeViewModel: AlertBadgeViewModel = hiltViewModel()
 ) {
+    val alertCount by badgeViewModel.unresolvedCount.collectAsStateWithLifecycle()
+
     val bottomNavItems = listOf(
         BottomNavItem(Screen.Dashboard, Icons.Filled.Home, "Home"),
         BottomNavItem(Screen.Animals, Icons.Filled.Pets, "Animals"),
@@ -142,6 +149,7 @@ fun MainScaffold(
                 // ── BOTTOM TAB DESTINATIONS ─────────────────────
                 composable(Screen.Dashboard.route) {
                     DashboardScreen(
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -153,6 +161,7 @@ fun MainScaffold(
                         onAnimalClick = { id -> navController.navigate(Screen.AnimalDetail.createRoute(id)) },
                         onAddAnimalClick = { navController.navigate(Screen.AddAnimal.route) },
                         onScanQrClick = { navController.navigate(Screen.QrScanner.route) },
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -161,6 +170,7 @@ fun MainScaffold(
 
                 composable(Screen.Milk.route) {
                     MilkScreen(
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -169,6 +179,7 @@ fun MainScaffold(
 
                 composable(Screen.Health.route) {
                     HealthScreen(
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -177,6 +188,7 @@ fun MainScaffold(
 
                 composable(Screen.Finance.route) {
                     FinanceScreen(
+                        alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
                         onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -185,10 +197,11 @@ fun MainScaffold(
 
                 // ── HEADER ACTIONS ──────────────────────────────
                 composable(Screen.Alerts.route) {
-                    ComingSoonScreen(
-                        title = "Alerts",
-                        subtitle = "All your farm alerts and reminders in one place. Bell badge shows unresolved count. Wired up in PR #6.",
-                        icon = Icons.Filled.Notifications
+                    AlertsScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenAnimal = { id ->
+                            navController.navigate(Screen.AnimalDetail.createRoute(id))
+                        }
                     )
                 }
 

@@ -14,6 +14,8 @@ import com.pashu360.app.feature.health.data.local.VetContactDao
 import com.pashu360.app.feature.health.data.local.VetContactEntity
 import com.pashu360.app.feature.milk.data.local.MilkRecordDao
 import com.pashu360.app.feature.milk.data.local.MilkRecordEntity
+import com.pashu360.app.feature.notifications.data.local.AlertDao
+import com.pashu360.app.feature.notifications.data.local.AlertEntity
 
 @Database(
     entities = [
@@ -23,8 +25,9 @@ import com.pashu360.app.feature.milk.data.local.MilkRecordEntity
         VaccinationEntity::class,
         VetContactEntity::class,
         FinancialRecordEntity::class,
+        AlertEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -34,6 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun vaccinationDao(): VaccinationDao
     abstract fun vetContactDao(): VetContactDao
     abstract fun financialRecordDao(): FinancialRecordDao
+    abstract fun alertDao(): AlertDao
 
     companion object {
         const val DATABASE_NAME = "pashu360.db"

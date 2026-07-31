@@ -4,14 +4,26 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import com.pashu360.app.feature.notifications.system.AlertScannerWorker
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class Pashu360App : Application() {
+class Pashu360App : Application(), Configuration.Provider {
+
+    @Inject lateinit var workerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
+        AlertScannerWorker.schedulePeriodic(this)
     }
 
     private fun createNotificationChannels() {

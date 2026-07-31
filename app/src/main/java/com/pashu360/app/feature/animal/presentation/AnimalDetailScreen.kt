@@ -6,21 +6,29 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Grass
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import android.widget.Toast
+import com.pashu360.app.core.domain.model.MilkSession
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +57,23 @@ fun AnimalDetailScreen(
     onBack: () -> Unit
 ) {
     val animal by viewModel.animal.collectAsStateWithLifecycle()
+    val milkSheet by viewModel.milkSheet.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is AnimalDetailEvent.MilkSaved -> {
+                    Toast.makeText(context,
+                        "✓ Logged %.1f L".format(event.litres),
+                        Toast.LENGTH_SHORT).show()
+                }
+                is AnimalDetailEvent.ShowError -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     if (animal == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -137,9 +162,11 @@ fun AnimalDetailScreen(
 
                         // Quick action buttons row
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            HeaderAction("Log Milk", Icons.Filled.LocalDrink) { /* TODO */ }
-                            HeaderAction("Vaccine", Icons.Filled.Vaccines) { /* TODO */ }
-                            HeaderAction("Health", Icons.Filled.Favorite) { /* TODO */ }
+                            HeaderAction("Log Milk", Icons.Filled.LocalDrink) {
+                                viewModel.openMilkSheet()
+                            }
+                            HeaderAction("Vaccine", Icons.Filled.Vaccines) { /* TODO PR #4 */ }
+                            HeaderAction("Health", Icons.Filled.Favorite) { /* TODO PR #4 */ }
                         }
 
                         Spacer(Modifier.height(20.dp))
@@ -190,6 +217,176 @@ fun AnimalDetailScreen(
                 Spacer(Modifier.height(32.dp))
             }
         }
+    }
+
+    // ── QUICK MILK ENTRY BOTTOM SHEET ─────────────────
+    if (milkSheet.show) {
+        QuickMilkEntrySheet(
+            animalName = a.displayName,
+            state = milkSheet,
+            onDismiss = viewModel::closeMilkSheet,
+            onSessionChange = viewModel::onSessionChanged,
+            onQuantityChange = viewModel::onQuantityChanged,
+            onFatChange = viewModel::onFatChanged,
+            onSnfChange = viewModel::onSnfChanged,
+            onToggleQuality = viewModel::onToggleQualityFields,
+            onSave = viewModel::onSaveMilk
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun QuickMilkEntrySheet(
+    animalName: String,
+    state: QuickMilkSheetState,
+    onDismiss: () -> Unit,
+    onSessionChange: (MilkSession) -> Unit,
+    onQuantityChange: (String) -> Unit,
+    onFatChange: (String) -> Unit,
+    onSnfChange: (String) -> Unit,
+    onToggleQuality: () -> Unit,
+    onSave: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)
+        ) {
+            Text("Log Milk", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("for $animalName",
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Spacer(Modifier.height(20.dp))
+
+            // Session toggle
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MilkSession.entries.forEach { session ->
+                    SessionToggle(
+                        label = "${session.emoji} ${session.displayName}",
+                        selected = state.session == session,
+                        onClick = { onSessionChange(session) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Text("Quantity",
+                fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(
+                value = state.quantity,
+                onValueChange = onQuantityChange,
+                placeholder = { Text("Litres") },
+                trailingIcon = { Text(" L", modifier = Modifier.padding(end = 12.dp),
+                    fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                modifier = Modifier.fillMaxWidth().height(60.dp)
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(onClick = onToggleQuality) {
+                Icon(Icons.Filled.Tune, null, tint = PashuGreen, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    if (state.showQualityFields) "Hide quality" else "Add fat/SNF (optional)",
+                    color = PashuGreen, fontSize = 13.sp, fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            if (state.showQualityFields) {
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = state.fat,
+                        onValueChange = onFatChange,
+                        label = { Text("Fat %") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                        modifier = Modifier.weight(1f).height(60.dp)
+                    )
+                    OutlinedTextField(
+                        value = state.snf,
+                        onValueChange = onSnfChange,
+                        label = { Text("SNF %") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                        modifier = Modifier.weight(1f).height(60.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Button(
+                onClick = onSave,
+                enabled = state.isValid && !state.isSaving,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PashuGreen,
+                    disabledContainerColor = PashuGreen.copy(alpha = 0.4f)
+                )
+            ) {
+                if (state.isSaving) {
+                    CircularProgressIndicator(Modifier.size(20.dp),
+                        color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.Filled.Check, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Save",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White)
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun SessionToggle(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        color = if (selected) PashuGreen else MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            1.5.dp,
+            if (selected) PashuGreen else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier
+    ) {
+        Text(
+            label,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp
+        )
     }
 }
 

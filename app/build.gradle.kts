@@ -50,18 +50,6 @@ android {
     }
 }
 
-// Force Kotlin stdlib to match our compiler version (2.2.10).
-// Some newer libraries (Coil 2.7, Supabase 3.7, Vico 2.0-beta) may
-// transitively pull in Kotlin stdlib 2.4.0, which the 2.2 compiler can't read.
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jetbrains.kotlin" &&
-            requested.name.startsWith("kotlin-stdlib")) {
-            useVersion("2.2.10")
-        }
-    }
-}
-
 dependencies {
     // Compose BOM (Bill of Materials)
     implementation(platform(libs.androidx.compose.bom))

@@ -1,6 +1,8 @@
 package com.pashu360.app.feature.animal.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -48,6 +51,7 @@ import com.pashu360.app.core.presentation.theme.PashuAmber
 import com.pashu360.app.core.presentation.theme.PashuGreen
 import com.pashu360.app.core.presentation.theme.PashuGreenDark
 import com.pashu360.app.core.presentation.theme.PashuGreenLight
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +62,8 @@ fun AnimalDetailScreen(
 ) {
     val animal by viewModel.animal.collectAsStateWithLifecycle()
     val milkSheet by viewModel.milkSheet.collectAsStateWithLifecycle()
+    val vaccinationSheet by viewModel.vaccinationSheet.collectAsStateWithLifecycle()
+    val healthSheet by viewModel.healthSheet.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -66,6 +72,16 @@ fun AnimalDetailScreen(
                 is AnimalDetailEvent.MilkSaved -> {
                     Toast.makeText(context,
                         "✓ Logged %.1f L".format(event.litres),
+                        Toast.LENGTH_SHORT).show()
+                }
+                is AnimalDetailEvent.VaccinationSaved -> {
+                    Toast.makeText(context,
+                        "💉 ${event.name} recorded",
+                        Toast.LENGTH_SHORT).show()
+                }
+                is AnimalDetailEvent.HealthSaved -> {
+                    Toast.makeText(context,
+                        "🩺 Health event saved",
                         Toast.LENGTH_SHORT).show()
                 }
                 is AnimalDetailEvent.ShowError -> {
@@ -165,8 +181,12 @@ fun AnimalDetailScreen(
                             HeaderAction("Log Milk", Icons.Filled.LocalDrink) {
                                 viewModel.openMilkSheet()
                             }
-                            HeaderAction("Vaccine", Icons.Filled.Vaccines) { /* TODO PR #4 */ }
-                            HeaderAction("Health", Icons.Filled.Favorite) { /* TODO PR #4 */ }
+                            HeaderAction("Vaccine", Icons.Filled.Vaccines) {
+                                viewModel.openVaccinationSheet()
+                            }
+                            HeaderAction("Health", Icons.Filled.Favorite) {
+                                viewModel.openHealthSheet()
+                            }
                         }
 
                         Spacer(Modifier.height(20.dp))
@@ -231,6 +251,41 @@ fun AnimalDetailScreen(
             onSnfChange = viewModel::onSnfChanged,
             onToggleQuality = viewModel::onToggleQualityFields,
             onSave = viewModel::onSaveMilk
+        )
+    }
+
+    // ── QUICK VACCINATION SHEET ────────────────────────
+    if (vaccinationSheet.show) {
+        AnimalVaccinationSheet(
+            animalName = a.displayName,
+            state = vaccinationSheet,
+            onDismiss = viewModel::closeVaccinationSheet,
+            onTemplateChange = viewModel::onVaccineTemplateChanged,
+            onCustomNameChange = viewModel::onCustomVaccineNameChanged,
+            onAdministeredDateChange = viewModel::onVaccinationAdministeredDateChanged,
+            onNextDueDateChange = viewModel::onVaccinationNextDueDateChanged,
+            onBatchChange = viewModel::onVaccinationBatchChanged,
+            onAdminByChange = viewModel::onVaccinationAdminByChanged,
+            onCostChange = viewModel::onVaccinationCostChanged,
+            onSave = viewModel::onSaveVaccination
+        )
+    }
+
+    // ── QUICK HEALTH EVENT SHEET ───────────────────────
+    if (healthSheet.show) {
+        AnimalHealthEventSheet(
+            animalName = a.displayName,
+            state = healthSheet,
+            onDismiss = viewModel::closeHealthSheet,
+            onEventTypeChange = viewModel::onHealthTypeChanged,
+            onSeverityChange = viewModel::onHealthSeverityChanged,
+            onSymptomToggle = viewModel::onHealthSymptomToggled,
+            onDiagnosisChange = viewModel::onHealthDiagnosisChanged,
+            onMedicineNameChange = viewModel::onHealthMedicineNameChanged,
+            onMedicineDoseChange = viewModel::onHealthMedicineDoseChanged,
+            onVetNameChange = viewModel::onHealthVetNameChanged,
+            onCostChange = viewModel::onHealthCostChanged,
+            onSave = viewModel::onSaveHealthEvent
         )
     }
 }
@@ -543,4 +598,438 @@ private fun TabPlaceholder(title: String, subtitle: String, icon: ImageVector) {
                 color = PashuAmber)
         }
     }
+}
+
+// ─────────────────────────────────────────────────────────
+// PER-ANIMAL VACCINATION SHEET
+// ─────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class, kotlin.time.ExperimentalTime::class)
+@Composable
+private fun AnimalVaccinationSheet(
+    animalName: String,
+    state: QuickVaccinationState,
+    onDismiss: () -> Unit,
+    onTemplateChange: (com.pashu360.app.core.domain.model.VaccineTemplate?) -> Unit,
+    onCustomNameChange: (String) -> Unit,
+    onAdministeredDateChange: (kotlinx.datetime.LocalDate) -> Unit,
+    onNextDueDateChange: (kotlinx.datetime.LocalDate?) -> Unit,
+    onBatchChange: (String) -> Unit,
+    onAdminByChange: (String) -> Unit,
+    onCostChange: (String) -> Unit,
+    onSave: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text("💉 Add Vaccination", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("for $animalName",
+                fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(20.dp))
+
+            Text("Vaccine", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                com.pashu360.app.core.domain.model.VaccineCatalog.templates.forEach { template ->
+                    Surface(
+                        onClick = { onTemplateChange(template) },
+                        color = if (state.template == template) PashuGreen
+                                else MaterialTheme.colorScheme.surface,
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.5.dp,
+                            if (state.template == template) PashuGreen
+                            else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        ),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Text(
+                            template.name,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                            color = if (state.template == template) Color.White
+                                    else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(
+                value = state.customName,
+                onValueChange = onCustomNameChange,
+                label = { Text("Or type custom vaccine") },
+                enabled = state.template == null,
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                SheetDateField(
+                    label = "Given on",
+                    date = state.administeredDate,
+                    onDateChange = onAdministeredDateChange,
+                    modifier = Modifier.weight(1f)
+                )
+                SheetDateField(
+                    label = "Next due (auto)",
+                    date = state.nextDueDate,
+                    onDateChange = { onNextDueDateChange(it) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(
+                value = state.administeredBy,
+                onValueChange = onAdminByChange,
+                label = { Text("Administered by (optional)") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = state.batchNumber,
+                    onValueChange = onBatchChange,
+                    label = { Text("Batch #") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = state.cost,
+                    onValueChange = onCostChange,
+                    label = { Text("Cost ₹") },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                    ),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Button(
+                onClick = onSave,
+                enabled = state.isValid && !state.isSaving,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PashuGreen,
+                    disabledContainerColor = PashuGreen.copy(alpha = 0.4f)
+                )
+            ) {
+                if (state.isSaving) {
+                    CircularProgressIndicator(Modifier.size(20.dp),
+                        color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.Filled.Check, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Save", fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────
+// PER-ANIMAL HEALTH EVENT SHEET
+// ─────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class, kotlin.time.ExperimentalTime::class)
+@Composable
+private fun AnimalHealthEventSheet(
+    animalName: String,
+    state: QuickHealthEventState,
+    onDismiss: () -> Unit,
+    onEventTypeChange: (com.pashu360.app.core.domain.model.HealthEventType) -> Unit,
+    onSeverityChange: (com.pashu360.app.core.domain.model.Severity) -> Unit,
+    onSymptomToggle: (String) -> Unit,
+    onDiagnosisChange: (String) -> Unit,
+    onMedicineNameChange: (String) -> Unit,
+    onMedicineDoseChange: (String) -> Unit,
+    onVetNameChange: (String) -> Unit,
+    onCostChange: (String) -> Unit,
+    onSave: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text("🩺 Log Health Event", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("for $animalName",
+                fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Spacer(Modifier.height(16.dp))
+            Text("Event Type", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                com.pashu360.app.core.domain.model.HealthEventType.entries.forEach { type ->
+                    Surface(
+                        onClick = { onEventTypeChange(type) },
+                        color = if (state.eventType == type) PashuGreen
+                                else MaterialTheme.colorScheme.surface,
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.5.dp,
+                            if (state.eventType == type) PashuGreen
+                            else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        ),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(type.emoji, fontSize = 14.sp)
+                            Spacer(Modifier.width(4.dp))
+                            Text(type.displayName,
+                                fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                                color = if (state.eventType == type) Color.White
+                                        else MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Text("Symptoms", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Tap all that apply", fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            androidx.compose.foundation.layout.FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                com.pashu360.app.core.domain.model.SymptomCatalog.symptoms.forEach { s ->
+                    val isSelected = s in state.selectedSymptoms
+                    Surface(
+                        onClick = { onSymptomToggle(s) },
+                        color = if (isSelected) PashuGreen else MaterialTheme.colorScheme.surface,
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.5.dp,
+                            if (isSelected) PashuGreen
+                            else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        ),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Text(s,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            fontSize = 12.sp, fontWeight = FontWeight.Medium,
+                            color = if (isSelected) Color.White
+                                    else MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Text("Severity", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.pashu360.app.core.domain.model.Severity.entries.forEach { sev ->
+                    val color = when (sev) {
+                        com.pashu360.app.core.domain.model.Severity.MILD -> PashuGreen
+                        com.pashu360.app.core.domain.model.Severity.MODERATE -> PashuAmber
+                        com.pashu360.app.core.domain.model.Severity.SEVERE -> ColorSick
+                    }
+                    Surface(
+                        onClick = { onSeverityChange(sev) },
+                        color = if (state.severity == sev) color
+                                else MaterialTheme.colorScheme.surface,
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.5.dp,
+                            if (state.severity == sev) color
+                            else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(sev.displayName,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                            color = if (state.severity == sev) Color.White
+                                    else MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            OutlinedTextField(
+                value = state.diagnosis,
+                onValueChange = onDiagnosisChange,
+                label = { Text("Diagnosis (optional)") },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                minLines = 2, maxLines = 3,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = state.medicineName,
+                    onValueChange = onMedicineNameChange,
+                    label = { Text("Medicine") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.weight(2f)
+                )
+                OutlinedTextField(
+                    value = state.medicineDose,
+                    onValueChange = onMedicineDoseChange,
+                    label = { Text("Dose") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = state.vetName,
+                    onValueChange = onVetNameChange,
+                    label = { Text("Vet name") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.weight(2f)
+                )
+                OutlinedTextField(
+                    value = state.cost,
+                    onValueChange = onCostChange,
+                    label = { Text("Cost ₹") },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                    ),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Button(
+                onClick = onSave,
+                enabled = !state.isSaving,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PashuGreen,
+                    disabledContainerColor = PashuGreen.copy(alpha = 0.4f)
+                )
+            ) {
+                if (state.isSaving) {
+                    CircularProgressIndicator(Modifier.size(20.dp),
+                        color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.Filled.Check, null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Save", fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────
+// SHARED DATE FIELD
+// ─────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class, kotlin.time.ExperimentalTime::class)
+@Composable
+private fun SheetDateField(
+    label: String,
+    date: kotlinx.datetime.LocalDate?,
+    onDateChange: (kotlinx.datetime.LocalDate) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
+
+    Column(modifier = modifier) {
+        Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(4.dp))
+        OutlinedTextField(
+            value = date?.toString() ?: "—",
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { showDialog = true }) {
+                    Icon(Icons.Filled.CalendarToday, null,
+                        tint = PashuGreen, modifier = Modifier.size(18.dp))
+                }
+            },
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+            modifier = Modifier.fillMaxWidth()
+                .clickable(onClick = { showDialog = true })
+        )
+    }
+
+    if (showDialog) {
+        val state = rememberDatePickerState(
+            initialSelectedDateMillis = System.currentTimeMillis()
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    state.selectedDateMillis?.let { millis ->
+                        // Convert epoch millis → kotlin.time.Instant → LocalDate via kotlinx-datetime
+                        // extension. Access `date` after the extension imported at file top.
+                        val picked = pickedDateFromMillis(millis)
+                        onDateChange(picked)
+                    }
+                    showDialog = false
+                }) {
+                    Text("OK", color = PashuGreen, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = state)
+        }
+    }
+}
+
+@OptIn(kotlin.time.ExperimentalTime::class)
+private fun pickedDateFromMillis(millis: Long): kotlinx.datetime.LocalDate {
+    val instant = kotlin.time.Instant.fromEpochMilliseconds(millis)
+    return instant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC).date
 }

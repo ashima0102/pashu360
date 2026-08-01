@@ -1,6 +1,7 @@
 package com.pashu360.app.core.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,6 +12,7 @@ import com.pashu360.app.feature.auth.presentation.FarmSetupScreen
 import com.pashu360.app.feature.auth.presentation.LoginScreen
 import com.pashu360.app.feature.auth.presentation.OtpVerificationScreen
 import com.pashu360.app.feature.auth.presentation.RegisterScreen
+import com.pashu360.app.feature.auth.presentation.RegisterViewModel
 import com.pashu360.app.feature.auth.presentation.SplashScreen
 
 @Composable
@@ -73,8 +75,12 @@ fun Pashu360NavHost(
 
         // ── REGISTER ──────────────────────────────────────
         composable(Screen.Register.route) {
+            val vm: RegisterViewModel = hiltViewModel()
             RegisterScreen(
-                onRegistered = { navController.navigate(Screen.FarmSetup.route) },
+                onRegistered = { fullName ->
+                    vm.stashOwnerName(fullName)
+                    navController.navigate(Screen.FarmSetup.route)
+                },
                 onBack = { navController.popBackStack() }
             )
         }

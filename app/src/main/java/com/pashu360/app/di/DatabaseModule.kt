@@ -7,6 +7,7 @@ import com.pashu360.app.feature.animal.data.local.AnimalDao
 import com.pashu360.app.feature.breeding.data.local.BreedingRecordDao
 import com.pashu360.app.feature.breeding.data.local.HeatRecordDao
 import com.pashu360.app.feature.breeding.data.local.PregnancyRecordDao
+import com.pashu360.app.feature.farm.data.local.FarmDao
 import com.pashu360.app.feature.feeding.data.local.FeedInventoryDao
 import com.pashu360.app.feature.feeding.data.local.FeedRecordDao
 import com.pashu360.app.feature.feeding.data.local.FeedTypeDao
@@ -73,4 +74,7 @@ object DatabaseModule {
 
     @Provides
     fun providePregnancyRecordDao(db: AppDatabase): PregnancyRecordDao = db.pregnancyRecordDao()
+
+    @Provides
+    fun provideFarmDao(db: AppDatabase): FarmDao = db.farmDao()
 }

@@ -85,16 +85,18 @@ fun DashboardScreen(
                     Spacer(Modifier.height(4.dp))
 
                     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                        Text("🌅 Good Morning",
+                        Text("${state.greetingEmoji} ${state.greetingByTime}",
                             fontSize = 13.sp,
                             color = Color.White.copy(alpha = 0.85f),
                             fontWeight = FontWeight.Medium)
-                        Text("Ramesh",
+                        Text(
+                            state.ownerName.takeIf { it.isNotBlank() }?.split(' ')?.first() ?: "Farmer",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White)
                         Spacer(Modifier.height(4.dp))
-                        Text("Sharma Dairy Farm • Wed, 1 Aug",
+                        val farmLabel = state.farmName.takeIf { it.isNotBlank() } ?: "Your Farm"
+                        Text("$farmLabel • ${state.todayFormatted}",
                             fontSize = 12.sp,
                             color = Color.White.copy(alpha = 0.8f))
 
@@ -162,7 +164,11 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                MiniStat("${state.cowCount}", "Cows", Icons.Filled.Pets, PashuGreen, Modifier.weight(1f))
+                val cowsLabel = if (state.expectedHerdSize > 0)
+                    "${state.cowCount} / ${state.expectedHerdSize}"
+                else
+                    "${state.cowCount}"
+                MiniStat(cowsLabel, "Cows", Icons.Filled.Pets, PashuGreen, Modifier.weight(1f))
                 MiniStat("${state.vaccinesDueCount}", "Vaccines", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
                 MiniStat("${state.sickCount}", "Sick", Icons.Filled.Favorite, ColorSick, Modifier.weight(1f))
             }

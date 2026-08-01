@@ -15,11 +15,23 @@ class SessionStore @Inject constructor() {
     private val _activeFarmId = MutableStateFlow(DEMO_FARM_ID)
     val activeFarmId: StateFlow<String> = _activeFarmId
 
+    // In-memory handoff from RegisterScreen → FarmSetupScreen so the owner
+    // name typed in "Full Name" pre-fills the setup wizard. Not persisted;
+    // cleared once Farm row is written.
+    private var pendingOwnerName: String = ""
+
     fun setActiveFarmId(id: String) {
         _activeFarmId.value = id
     }
 
     fun getActiveFarmId(): String = _activeFarmId.value
+
+    fun setPendingOwnerName(name: String) { pendingOwnerName = name.trim() }
+    fun consumePendingOwnerName(): String {
+        val v = pendingOwnerName
+        pendingOwnerName = ""
+        return v
+    }
 
     companion object {
         // Fixed farm ID until Supabase auth wires in the real farmer's farm.

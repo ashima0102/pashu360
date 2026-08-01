@@ -46,6 +46,7 @@ import com.pashu360.app.feature.animal.presentation.AnimalListScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
 import com.pashu360.app.feature.breeding.presentation.BreedingScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
+import com.pashu360.app.feature.dashboard.presentation.DashboardViewModel
 import com.pashu360.app.feature.feeding.presentation.FeedingScreen
 import com.pashu360.app.feature.finance.presentation.FinanceScreen
 import com.pashu360.app.feature.health.presentation.HealthScreen
@@ -63,9 +64,11 @@ data class BottomNavItem(
 fun MainScaffold(
     rootNavController: NavController,
     navController: NavHostController = rememberNavController(),
-    badgeViewModel: AlertBadgeViewModel = hiltViewModel()
+    badgeViewModel: AlertBadgeViewModel = hiltViewModel(),
+    dashboardViewModel: DashboardViewModel = hiltViewModel()
 ) {
     val alertCount by badgeViewModel.unresolvedCount.collectAsStateWithLifecycle()
+    val dashboardState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
     val bottomNavItems = listOf(
         BottomNavItem(Screen.Dashboard, Icons.Filled.Home, "Home"),
@@ -86,8 +89,8 @@ fun MainScaffold(
         drawerState = drawerState,
         drawerContent = {
             PashuDrawer(
-                userName = "Ramesh Sharma",       // TODO: from SessionStore
-                farmName = "Sharma Dairy Farm",   // TODO: from SessionStore
+                userName = dashboardState.ownerName.takeIf { it.isNotBlank() } ?: "Farmer",
+                farmName = dashboardState.farmName.takeIf { it.isNotBlank() } ?: "Your Farm",
                 onItemClick = { route ->
                     scope.launch { drawerState.close() }
                     if (route == "dashboard") {

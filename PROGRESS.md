@@ -12,14 +12,15 @@
 | **Phase 0** — Foundation & Auth Shell | ✅ Done | 100% |
 | **Phase 1** — Animal Management | ✅ Done | 100% |
 | **Phase 2** — Milk Production | ✅ Done | 100% |
-| **Phase 3** — Health Management (records + vaccinations + vet contacts) | ✅ Done (read side) | 90% |
+| **Phase 3** — Health Management (records + vaccinations + vet contacts) | ✅ Done | 100% |
 | **Phase 4** — Finance Management | ✅ Done | 100% |
 | **Phase 5** — Alerts + Local Notifications (WorkManager) | ✅ Done | 100% |
-| **Phase 6** — Add-forms wiring + alert scheduler triggers | ⬜ Not started | 0% |
-| **Phase 7** — Feeding + Breeding + Pregnancy | ⬜ Not started | 0% |
-| **Phase 8** — Reports + PDF/CSV export | ⬜ Not started | 0% |
-| **Phase 9** — Offline sync with Supabase | ⬜ Not started | 0% |
-| **Phase 10** — Localization + polish + Play Store | ⬜ Not started | 0% |
+| **Phase 6** — Health add-forms + alert scheduler triggers | ✅ Done (PR #9 open) | 100% |
+| **Phase 7** — Feeding module | ✅ Done (this PR) | 100% |
+| **Phase 8** — Breeding + Pregnancy | ⬜ Not started | 0% |
+| **Phase 9** — Reports + PDF/CSV export | ⬜ Not started | 0% |
+| **Phase 10** — Offline sync with Supabase | ⬜ Not started | 0% |
+| **Phase 11** — Localization + polish + Play Store | ⬜ Not started | 0% |
 
 **5 of 10 phases complete (~50%)** — the whole core-tracking loop (animals → milk → health → finance → alerts) is live locally.
 

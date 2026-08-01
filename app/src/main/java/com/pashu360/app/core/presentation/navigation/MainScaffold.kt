@@ -154,7 +154,11 @@ fun MainScaffold(
                         alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
-                        onProfileClick = { navController.navigate(Screen.Profile.route) }
+                        onProfileClick = { navController.navigate(Screen.Profile.route) },
+                        onLogMilkClick = { navController.navigate(Screen.Milk.route) },
+                        onAddVaccineClick = { navController.navigate(Screen.Health.route) },
+                        onAddAnimalClick = { navController.navigate(Screen.AddAnimal.route) },
+                        onFeedClick = { navController.navigate(Screen.Feeding.route) }
                     )
                 }
 

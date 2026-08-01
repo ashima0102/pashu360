@@ -39,7 +39,11 @@ fun DashboardScreen(
     alertCount: Int = 2,   // TODO: wire to Alerts repository in PR #6
     onMenuClick: () -> Unit = {},
     onBellClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onLogMilkClick: () -> Unit = {},
+    onAddVaccineClick: () -> Unit = {},
+    onAddAnimalClick: () -> Unit = {},
+    onFeedClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -165,13 +169,17 @@ fun DashboardScreen(
                     color = MaterialTheme.colorScheme.onSurface)
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    QuickAction("Log Milk", Icons.Filled.LocalDrink, PashuGreen, Modifier.weight(1f))
-                    QuickAction("Vaccine", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
+                    QuickAction("Log Milk", Icons.Filled.LocalDrink, PashuGreen,
+                        onClick = onLogMilkClick, modifier = Modifier.weight(1f))
+                    QuickAction("Vaccine", Icons.Filled.Vaccines, PashuAmber,
+                        onClick = onAddVaccineClick, modifier = Modifier.weight(1f))
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    QuickAction("Add Cow", Icons.Filled.Add, MaterialTheme.colorScheme.tertiary, Modifier.weight(1f))
-                    QuickAction("Feed", Icons.Filled.Grass, Color(0xFF7B9E4A), Modifier.weight(1f))
+                    QuickAction("Add Cow", Icons.Filled.Add, MaterialTheme.colorScheme.tertiary,
+                        onClick = onAddAnimalClick, modifier = Modifier.weight(1f))
+                    QuickAction("Feed", Icons.Filled.Grass, Color(0xFF7B9E4A),
+                        onClick = onFeedClick, modifier = Modifier.weight(1f))
                 }
             }
 
@@ -260,9 +268,11 @@ private fun QuickAction(
     label: String,
     icon: ImageVector,
     color: Color,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),

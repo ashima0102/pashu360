@@ -15,6 +15,9 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +39,7 @@ import com.pashu360.app.core.presentation.theme.PashuGreenLight
 
 @Composable
 fun DashboardScreen(
+    viewModel: DashboardViewModel = hiltViewModel(),
     alertCount: Int = 2,   // TODO: wire to Alerts repository in PR #6
     onMenuClick: () -> Unit = {},
     onBellClick: () -> Unit = {},
@@ -45,6 +49,7 @@ fun DashboardScreen(
     onAddAnimalClick: () -> Unit = {},
     onFeedClick: () -> Unit = {}
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -157,9 +162,9 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                MiniStat("0", "Cows", Icons.Filled.Pets, PashuGreen, Modifier.weight(1f))
-                MiniStat("0", "Vaccines", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
-                MiniStat("0", "Sick", Icons.Filled.Favorite, ColorSick, Modifier.weight(1f))
+                MiniStat("${state.cowCount}", "Cows", Icons.Filled.Pets, PashuGreen, Modifier.weight(1f))
+                MiniStat("${state.vaccinesDueCount}", "Vaccines", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
+                MiniStat("${state.sickCount}", "Sick", Icons.Filled.Favorite, ColorSick, Modifier.weight(1f))
             }
 
             // ── QUICK ACTIONS ────────────────────

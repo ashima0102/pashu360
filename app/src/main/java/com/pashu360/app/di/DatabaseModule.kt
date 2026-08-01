@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.pashu360.app.core.data.local.AppDatabase
 import com.pashu360.app.feature.animal.data.local.AnimalDao
+import com.pashu360.app.feature.breeding.data.local.BreedingRecordDao
+import com.pashu360.app.feature.breeding.data.local.HeatRecordDao
+import com.pashu360.app.feature.breeding.data.local.PregnancyRecordDao
 import com.pashu360.app.feature.feeding.data.local.FeedInventoryDao
 import com.pashu360.app.feature.feeding.data.local.FeedRecordDao
 import com.pashu360.app.feature.feeding.data.local.FeedTypeDao
@@ -61,4 +64,13 @@ object DatabaseModule {
 
     @Provides
     fun provideFeedInventoryDao(db: AppDatabase): FeedInventoryDao = db.feedInventoryDao()
+
+    @Provides
+    fun provideHeatRecordDao(db: AppDatabase): HeatRecordDao = db.heatRecordDao()
+
+    @Provides
+    fun provideBreedingRecordDao(db: AppDatabase): BreedingRecordDao = db.breedingRecordDao()
+
+    @Provides
+    fun providePregnancyRecordDao(db: AppDatabase): PregnancyRecordDao = db.pregnancyRecordDao()
 }

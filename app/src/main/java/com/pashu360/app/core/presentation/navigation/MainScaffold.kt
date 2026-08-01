@@ -44,6 +44,7 @@ import com.pashu360.app.feature.animal.presentation.AddAnimalScreen
 import com.pashu360.app.feature.animal.presentation.AnimalDetailScreen
 import com.pashu360.app.feature.animal.presentation.AnimalListScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
+import com.pashu360.app.feature.breeding.presentation.BreedingScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
 import com.pashu360.app.feature.feeding.presentation.FeedingScreen
 import com.pashu360.app.feature.finance.presentation.FinanceScreen
@@ -231,17 +232,19 @@ fun MainScaffold(
                     )
                 }
                 composable(Screen.Breeding.route) {
-                    ComingSoonScreen(
-                        title = "Breeding",
-                        subtitle = "Heat cycles, AI records, and conception tracking.",
-                        icon = Icons.Filled.Favorite
+                    BreedingScreen(
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 composable(Screen.Pregnancy.route) {
-                    ComingSoonScreen(
-                        title = "Pregnancy",
-                        subtitle = "Track pregnancies, dry period, and expected calving dates.",
-                        icon = Icons.Filled.PregnantWoman
+                    BreedingScreen(
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 composable(Screen.Reports.route) {

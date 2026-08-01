@@ -5,13 +5,55 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased] — Phase 6 (Next)
+## [Unreleased] — Phase 9 (Next)
 
 ### Planned
-- Add Vaccination bottom sheet → wired to `AlertScheduler.scanNow()`
-- Add Health Event sheet with symptom multi-select
-- Add Vet Contact form
-- Heat + calving alert scanners in AlertScannerWorker
+- Reports module (milk / vaccination / financial)
+- PDF & CSV export via iTextPDF
+- Multi-farm switching
+
+---
+
+## [0.9.0] — 2026-08-02 · Phase 8 — Breeding + Pregnancy + Calving ✅
+
+Full reproduction lifecycle. Farmer can now trace an animal from first heat
+signs through mating, pregnancy confirmation, dry period, and calving —
+with the newborn calf auto-registered as a herd animal.
+
+### Added
+- Domain models: `HeatRecord`, `BreedingRecord`, `PregnancyRecord` + 5 enums
+  (`HeatIntensity`, `BreedingType` AI/NATURAL, `ConceptionStatus`
+  PENDING/CONFIRMED/FAILED, `PdMethod`, `CalvingOutcome`) with emojis + displayName
+- `HeatSymptomCatalog` (8 symptoms), `HeatRecord.expectedNextHeat(cycleDays = 21)`,
+  `BreedingRecord.expectedPdDate() / expectedCalvingDate()`
+- Denormalized detail types: `HeatRecordDetail`, `BreedingRecordDetail`, `PregnancyDetail`
+- Room v6 — 3 new entities (heat_records, breeding_records, pregnancy_records) with
+  CASCADE FK to animals, pipe-delimited symptom serialization
+- 3 non-suspend DAOs (KSP2-safe): observe/insert/update/delete + scanner helpers
+  (`getLatestPerAnimal`, `getPendingBreedings`, `getCalvingsInWindow`, `getById`)
+- `BreedingRepository` interface (18 methods) + Impl using `combine()` with
+  `animalsMap` flow for denormalized reads. `recordCalving()` writes calf via
+  `animalRepository.addAnimal()` first, then patches the pregnancy row with `calfAnimalId`
+- `BreedingViewModel` — 4 form states (Heat / Mating / Pregnancy / Calving),
+  `combine(groupA, groupB)` split for UI state (5+3 flows), auto-computed
+  defaults (`expectedCalvingDate = today + 280 days`, `dryPeriodStart = calving - 60 days`)
+- `BreedingScreen` — green-gradient header + 3 summary chips + 4 tabs +
+  contextual `ExtendedFloatingActionButton` per tab
+- 4 bottom-sheet forms:
+  - HeatSheet — animal picker, symptom chip multi-select, intensity toggle
+  - BreedingSheet — AI/Natural toggle with contextual fields, bull/batch/technician/cost
+  - PregnancySheet — PD method radio list, calculated expected calving preview
+  - CalvingSheet — outcome chips, difficulty 1–4, auto-create calf toggle with tag/name/gender
+- `AlertScannerWorker` extended:
+  - `scanExpectedHeats()` — 21-day cycle prediction, alerts 1 day early, dedup by `heat:{id}`
+  - `scanCalvingDue()` — 7-day window, URGENT ≤ 2 days, dedup by `calving:{id}`
+- Wired into `MainScaffold` for both `Screen.Breeding.route` and `Screen.Pregnancy.route`
+
+### Changed
+- Room DB bumped to v6, `DatabaseModule` provides 3 new DAOs
+- `RepositoryModule` binds `BreedingRepository`
+- Removed unused `PregnancyRecord.daysToCalving` computed property (fixed
+  Int?/Long? mismatch from newer kotlinx-datetime `toEpochDays()` return type)
 
 ---
 

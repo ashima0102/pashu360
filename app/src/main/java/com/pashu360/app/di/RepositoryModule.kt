@@ -2,6 +2,8 @@ package com.pashu360.app.di
 
 import com.pashu360.app.feature.animal.data.repository.AnimalRepositoryImpl
 import com.pashu360.app.feature.animal.domain.repository.AnimalRepository
+import com.pashu360.app.feature.breeding.data.repository.BreedingRepositoryImpl
+import com.pashu360.app.feature.breeding.domain.repository.BreedingRepository
 import com.pashu360.app.feature.feeding.data.repository.FeedingRepositoryImpl
 import com.pashu360.app.feature.feeding.domain.repository.FeedingRepository
 import com.pashu360.app.feature.finance.data.repository.FinanceRepositoryImpl
@@ -45,4 +47,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFeedingRepository(impl: FeedingRepositoryImpl): FeedingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBreedingRepository(impl: BreedingRepositoryImpl): BreedingRepository
 }

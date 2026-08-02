@@ -94,6 +94,7 @@ data class VaccineTemplate(
 object VaccineCatalog {
     val templates = listOf(
         VaccineTemplate("FMD Vaccine",         "Foot & Mouth Disease",     180),
+        VaccineTemplate("LSD Vaccine",         "Lumpy Skin Disease",       365),
         VaccineTemplate("BQ Vaccine",          "Black Quarter",            365),
         VaccineTemplate("HS Vaccine",          "Haemorrhagic Septicaemia", 365),
         VaccineTemplate("Brucellosis Vaccine", "Brucellosis",              365),

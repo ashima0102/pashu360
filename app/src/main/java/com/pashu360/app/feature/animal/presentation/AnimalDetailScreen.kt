@@ -64,7 +64,17 @@ fun AnimalDetailScreen(
     val milkSheet by viewModel.milkSheet.collectAsStateWithLifecycle()
     val vaccinationSheet by viewModel.vaccinationSheet.collectAsStateWithLifecycle()
     val healthSheet by viewModel.healthSheet.collectAsStateWithLifecycle()
+    val statusPickerVisible by viewModel.statusPickerVisible.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    val currentStatus = animal?.status
+    if (statusPickerVisible && currentStatus != null) {
+        StatusPickerDialog(
+            current = currentStatus,
+            onDismiss = viewModel::closeStatusPicker,
+            onSelect = viewModel::changeStatus
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -82,6 +92,11 @@ fun AnimalDetailScreen(
                 is AnimalDetailEvent.HealthSaved -> {
                     Toast.makeText(context,
                         "🩺 Health event saved",
+                        Toast.LENGTH_SHORT).show()
+                }
+                is AnimalDetailEvent.StatusChanged -> {
+                    Toast.makeText(context,
+                        "Status → ${event.status.displayName}",
                         Toast.LENGTH_SHORT).show()
                 }
                 is AnimalDetailEvent.ShowError -> {
@@ -160,7 +175,7 @@ fun AnimalDetailScreen(
                             fontWeight = FontWeight.Bold,
                             color = Color.White)
 
-                        StatusBadgeLarge(a.status)
+                        StatusBadgeLarge(a.status, onClick = viewModel::openStatusPicker)
 
                         Spacer(Modifier.height(6.dp))
 
@@ -532,17 +547,67 @@ private fun MiniStatDetail(label: String, value: String) {
 }
 
 @Composable
-private fun StatusBadgeLarge(status: AnimalStatus) {
+private fun StatusBadgeLarge(status: AnimalStatus, onClick: () -> Unit) {
     val bg = Color.White.copy(alpha = 0.25f)
-    Surface(color = bg, shape = RoundedCornerShape(12.dp)) {
-        Text(
-            status.displayName,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
+    Surface(onClick = onClick, color = bg, shape = RoundedCornerShape(12.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                status.displayName,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Spacer(Modifier.width(4.dp))
+            Text("✎", fontSize = 10.sp, color = Color.White.copy(alpha = 0.75f))
+        }
     }
+}
+
+@Composable
+private fun StatusPickerDialog(
+    current: AnimalStatus,
+    onDismiss: () -> Unit,
+    onSelect: (AnimalStatus) -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Change Status") },
+        text = {
+            Column {
+                AnimalStatus.entries.forEach { s ->
+                    val selected = s == current
+                    Surface(
+                        onClick = { onSelect(s) },
+                        color = if (selected) PashuGreen.copy(alpha = 0.15f)
+                                else MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            androidx.compose.material3.RadioButton(
+                                selected = selected,
+                                onClick = { onSelect(s) },
+                                colors = androidx.compose.material3.RadioButtonDefaults.colors(
+                                    selectedColor = PashuGreen
+                                )
+                            )
+                            Text(s.displayName, fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) { Text("Close") }
+        }
+    )
 }
 
 @Composable

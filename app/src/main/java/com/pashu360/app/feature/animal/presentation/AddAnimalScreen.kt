@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pashu360.app.core.domain.model.AnimalStatus
 import com.pashu360.app.core.domain.model.BreedCatalog
 import com.pashu360.app.core.domain.model.Gender
 import com.pashu360.app.core.presentation.theme.PashuGreen
@@ -185,6 +186,23 @@ fun AddAnimalScreen(
                 }
             }
 
+            InputBlock(label = "Status") {
+                val statusOptions = listOf(
+                    AnimalStatus.ACTIVE, AnimalStatus.PREGNANT,
+                    AnimalStatus.DRY, AnimalStatus.SICK
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    statusOptions.forEach { s ->
+                        StatusChoice(
+                            label = s.displayName,
+                            selected = uiState.status == s,
+                            modifier = Modifier.weight(1f),
+                            onClick = { viewModel.onStatusChanged(s) }
+                        )
+                    }
+                }
+            }
+
             InputBlock(label = "Date of Birth") {
                 DobPicker(
                     dob = uiState.dob,
@@ -295,6 +313,29 @@ private fun GenderChoice(label: String, selected: Boolean, modifier: Modifier, o
             color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
+        )
+    }
+}
+
+@Composable
+private fun StatusChoice(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        color = if (selected) PashuGreen else MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            1.5.dp,
+            if (selected) PashuGreen else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier
+    ) {
+        Text(
+            label,
+            modifier = Modifier.padding(vertical = 12.dp),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 12.sp
         )
     }
 }

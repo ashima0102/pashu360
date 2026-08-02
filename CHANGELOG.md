@@ -14,6 +14,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.1] — 2026-08-02 · Farm persistence + live Dashboard header ✅
+
+Merged along with Phase 8 (PR #11) after the merge-cascade rebase.
+
+### Added
+- `Farm` domain + Room `FarmEntity` (v8) / `FarmDao` / `FarmRepository`
+- `FarmSetupViewModel` — persists Owner Name, Farm Name, Village, State,
+  Expected herd size on "Start Managing My Farm" tap. Setup wizard no longer
+  discards its inputs.
+- New **Owner Name** field on FarmSetup, pre-filled from Register's Full Name
+  via `SessionStore.pendingOwnerName` in-memory handoff (`RegisterViewModel`)
+- `DashboardViewModel` — combines animal count, vaccines overdue+due-soon,
+  active health issues, Farm data, and today's date + time-based greeting
+- Dashboard header now shows real farm name, farmer's first name (fallback
+  "Farmer"), and formatted today's date ("Sat, 2 Aug"). Greeting adapts:
+  Morning/Afternoon/Evening/Night from device clock.
+- Cows mini-stat shows `X / Y expected` when farmer specified expected herd
+- Drawer header binds to the same live Farm data (removed hardcoded
+  "Ramesh Sharma / Sharma Dairy Farm" placeholders)
+- Dashboard **Quick Action** cards (Log Milk / Vaccine / Add Cow / Feed) now
+  navigate to their destinations. Previously the `QuickAction` composable had
+  no `onClick` param — cards rendered as decorative Material Cards.
+- Vaccinations / Sick counts on Home page mini-stats now use live queries
+  (previously hardcoded "0"s)
+- VetContact card's phone icon launches the system dialer
+
+### Changed
+- Room DB bumped to **v8** (adds `farms` table on top of v7)
+
+---
+
 ## [0.9.0] — 2026-08-02 · Phase 8 — Breeding + Pregnancy + Calving ✅
 
 Full reproduction lifecycle. Farmer can now trace an animal from first heat
@@ -50,10 +81,54 @@ with the newborn calf auto-registered as a herd animal.
 - Wired into `MainScaffold` for both `Screen.Breeding.route` and `Screen.Pregnancy.route`
 
 ### Changed
-- Room DB bumped to v6, `DatabaseModule` provides 3 new DAOs
-- `RepositoryModule` binds `BreedingRepository`
+- Room DB bumped to v7 for Breeding entities, then v8 with Farm entity added
+  during the merge-cascade rebase
+- `DatabaseModule` provides 3 new DAOs; `RepositoryModule` binds `BreedingRepository`
 - Removed unused `PregnancyRecord.daysToCalving` computed property (fixed
   Int?/Long? mismatch from newer kotlinx-datetime `toEpochDays()` return type)
+
+Merged via PR #11 — commit `88fd34b`
+
+---
+
+## [0.8.0] — 2026-08-02 · Phase 7 — Feeding Management ✅
+
+Feed logging + inventory + low-stock alerting. Farmer can now log daily
+feed events per animal or per herd, track inventory levels, and get
+low-stock alerts.
+
+### Added
+- Domain: `FeedType`, `FeedRecord`, `FeedInventory` with unit + threshold
+- Room v6 — 3 new entities (`feed_types`, `feed_records`, `feed_inventory`)
+- `FeedingRepository` interface + Impl
+- `FeedingScreen` with tabs for log, inventory, and per-animal history
+- `AlertScannerWorker.scanLowFeedStock()` fires `LOW_FEED_STOCK` alerts when
+  inventory `< lowStockThreshold`. URGENT when quantity ≤ 0.
+- Wired into `MainScaffold` as the drawer's Feeding destination
+
+Merged via PR #10 — commit `cc5f0b4`
+
+---
+
+## [0.7.0] — 2026-08-02 · Phase 6 — Health add-forms + alert scheduler ✅
+
+Follow-up to Phase 3 (read side): all three FABs on Health tab now open
+real bottom-sheet forms, and vaccinations trigger the alert scanner
+immediately after save so the bell badge updates within a moment.
+
+### Added
+- `HealthSheets.kt` — VaccinationSheet, HealthEventSheet, VetContactSheet
+- 8 preset Indian cattle vaccines in Vaccination sheet with auto-calculated
+  next-due date (FMD 180d, others 365d)
+- 13-symptom multi-select on HealthEventSheet
+- VetContactSheet with phone/specialty/clinic fields; phone icon launches
+  the system dialer from the Vet Contacts tab
+- `HealthViewModel` restructured with three form states + `AlertScheduler`
+  + `AnimalRepository` injection
+- `AnimalDetailScreen` quick-actions for Log Vaccine / Log Health wired to
+  the same sheets from within an animal profile
+
+Merged via PR #9 — commit `a739d42`
 
 ---
 

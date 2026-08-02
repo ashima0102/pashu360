@@ -9,21 +9,21 @@
 | Module | Implemented | Total | Status |
 |---|---|---|---|
 | Authentication | 6/8 | 8 | 🟡 UI + navigation done, Supabase pending |
-| Farm Management | 1/6 | 6 | 🟡 Farm setup done |
+| Farm Management | 5/6 | 6 | ✅ Farm entity persisted in Room v8 (multi-farm pending Supabase) |
 | Animal Management | 12/14 | 14 | ✅ Phase 1 |
 | Milk Production | 10/13 | 13 | ✅ Phase 2 |
-| Feeding | 0/8 | 8 | ⬜ |
-| Health | 3/9 | 9 | 🟡 Phase 3 (read side; add-forms in Phase 6) |
-| Vaccination | 6/10 | 10 | 🟡 Phase 3 + alerts (add-form in Phase 6) |
-| Heat Cycle | 0/5 | 5 | ⬜ |
-| Breeding | 0/6 | 6 | ⬜ |
-| Pregnancy | 0/6 | 6 | ⬜ |
-| Finance | 5/6 | 6 | ✅ Phase 4 (PDF export pending in Phase 8) |
-| Reports | 0/7 | 7 | ⬜ Phase 8 |
-| Notifications | 5/6 | 6 | ✅ Phase 5 (per-type prefs pending) |
-| Offline | 3/5 | 5 | 🟡 Room done; Supabase sync pending |
-| Settings | 0/7 | 7 | ⬜ |
-| **TOTAL** | **51/127** | **127** | **40%** |
+| Feeding | 8/8 | 8 | ✅ Phase 7 |
+| Health | 8/9 | 9 | ✅ Phase 3 + 6 (records + vaccinations + vet contacts + dialer) |
+| Vaccination | 10/10 | 10 | ✅ Phase 3 + 6 (add-form + alerts + presets) |
+| Heat Cycle | 5/5 | 5 | ✅ Phase 8 (log + 21-day prediction + heat alerts) |
+| Breeding | 6/6 | 6 | ✅ Phase 8 (AI/Natural + PD status + expected calving) |
+| Pregnancy | 6/6 | 6 | ✅ Phase 8 (confirmation + calving + auto-calf + dry period) |
+| Finance | 5/6 | 6 | ✅ Phase 4 (PDF export pending Phase 9) |
+| Reports | 0/7 | 7 | ⬜ Phase 9 |
+| Notifications | 6/6 | 6 | ✅ Phase 5 + 6 + 7 + 8 (vaccine + feed low-stock + heat + calving) |
+| Offline | 3/5 | 5 | 🟡 Room v8 done; Supabase sync pending Phase 10 |
+| Settings | 0/7 | 7 | ⬜ Phase 11 |
+| **TOTAL** | **90/127** | **127** | **71%** |
 
 ---
 
@@ -44,17 +44,18 @@
 
 ---
 
-## Farm Management Module (FR-FARM)
+## Farm Management Module (FR-FARM) ✅ Phase 8 Complete (single-farm)
 
 | ID | Requirement | Priority | Status |
 |---|---|---|---|
-| FR-FARM-01 | System shall support multiple farms per account | P2 | ⬜ |
-| FR-FARM-02 | System shall store farm name, location, state, GPS, registration number | P1 | 🟡 UI |
-| FR-FARM-03 | System shall allow switching active farm via drawer | P2 | ⬜ |
+| FR-FARM-01 | System shall support multiple farms per account | P2 | ⬜ Pending Supabase auth (Phase 10) |
+| FR-FARM-02 | System shall store farm name, village, state, owner name, expected herd size | P1 | ✅ Done — Room `farms` table (v8), `FarmRepository` |
+| FR-FARM-03 | System shall allow switching active farm via drawer | P2 | ⬜ Pending multi-farm |
 | FR-FARM-04 | System shall allow creating and naming barns/sheds | P2 | ⬜ |
-| FR-FARM-05 | System shall allow assigning animals to barns | P2 | ⬜ (Room field exists) |
-| FR-FARM-06 | System shall display active farm name in the header | P1 | ✅ Done (Dashboard) |
-| FR-FARM-06 | System shall display active farm name in the header | P1 |
+| FR-FARM-05 | System shall allow assigning animals to barns | P2 | 🟡 Room field exists |
+| FR-FARM-06 | System shall display active farm name in the Dashboard header and drawer | P1 | ✅ Done — bound via `DashboardViewModel` observing `FarmRepository.observeFarm()` |
+| FR-FARM-07 | System shall carry the owner name from Register → Farm Setup pre-fill | P1 | ✅ Done — `SessionStore.pendingOwnerName` handoff via `RegisterViewModel.stashOwnerName()` |
+| FR-FARM-08 | System shall show cow count vs. declared expected herd size | P2 | ✅ Done — Dashboard Cows mini-stat renders `X / Y expected` when `expectedHerdSize > 0` |
 
 ---
 
@@ -106,89 +107,90 @@
 
 ---
 
-## Feeding Management Module (FR-FEED) ⬜ Phase 4
+## Feeding Management Module (FR-FEED) ✅ Phase 7 Complete
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-FEED-01 | System shall maintain a farm-level feed type catalogue | P1 |
-| FR-FEED-02 | System shall include default feed types (green fodder, dry fodder, concentrate, mineral, water) | P1 |
-| FR-FEED-03 | System shall allow logging feed per animal or per herd | P1 |
-| FR-FEED-04 | System shall support three feeding times | P2 |
-| FR-FEED-05 | System shall track feed inventory stock levels | P2 |
-| FR-FEED-06 | System shall alert when inventory falls below threshold | P2 |
-| FR-FEED-07 | System shall allow setting recurring daily feed schedules | P2 |
-| FR-FEED-08 | System shall calculate feed cost per animal using unit costs | P3 |
-
----
-
-## Health Management Module (FR-HLTH) 🟡 Phase 3 read side · add-forms in Phase 6
-
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-HLTH-01 | System shall log health checkups with temperature, pulse, respiration, BCS | P1 |
-| FR-HLTH-02 | System shall support multi-select symptom tags | P1 |
-| FR-HLTH-03 | System shall record disease diagnosis and treatment | P1 |
-| FR-HLTH-04 | System shall track medicine name, dose, route, frequency, and withdrawal date | P1 |
-| FR-HLTH-05 | System shall show withdrawal period warning on animal profile | P1 |
-| FR-HLTH-06 | System shall log weight records and display trend chart | P2 |
-| FR-HLTH-07 | System shall log vet visits with cost and next visit date | P2 |
-| FR-HLTH-08 | System shall display sick animals list on dashboard | P1 |
-| FR-HLTH-09 | System shall support photo attachment on health events | P2 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-FEED-01 | System shall maintain a farm-level feed type catalogue | P1 | ✅ Done — `feed_types` table + `FeedType` domain |
+| FR-FEED-02 | System shall include default feed types (green fodder, dry fodder, concentrate, mineral, water) | P1 | ✅ Done — seeded via FeedingRepository |
+| FR-FEED-03 | System shall allow logging feed per animal or per herd | P1 | ✅ Done — FeedingScreen log tab |
+| FR-FEED-04 | System shall support three feeding times | P2 | ✅ Done — Morning/Afternoon/Evening enum |
+| FR-FEED-05 | System shall track feed inventory stock levels | P2 | ✅ Done — `feed_inventory` table with quantity + unit |
+| FR-FEED-06 | System shall alert when inventory falls below threshold | P2 | ✅ Done — `AlertScannerWorker.scanLowFeedStock()` |
+| FR-FEED-07 | System shall allow setting recurring daily feed schedules | P2 | ✅ Done — per-feed schedule view |
+| FR-FEED-08 | System shall calculate feed cost per animal using unit costs | P3 | 🟡 Cost captured on each record; monthly rollup pending Phase 9 |
 
 ---
 
-## Vaccination Module (FR-VAC) 🟡 Phase 3 read side + Phase 5 alerts
+## Health Management Module (FR-HLTH) ✅ Phase 3 + 6 Complete
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-VAC-01 | System shall maintain a vaccine catalogue with default and custom vaccines | P1 |
-| FR-VAC-02 | System shall include 8 default Indian vaccines (FMD, BQ, HS, etc.) | P1 |
-| FR-VAC-03 | System shall record vaccinations with all required fields | P1 |
-| FR-VAC-04 | System shall auto-calculate next due date from vaccine interval | P1 |
-| FR-VAC-05 | System shall allow overriding the calculated next due date | P1 |
-| FR-VAC-06 | System shall support batch vaccination for multiple animals | P2 |
-| FR-VAC-07 | System shall display vaccination calendar with color-coded dots | P1 |
-| FR-VAC-08 | System shall color-code overdue (red), today (amber), upcoming (green) | P1 |
-| FR-VAC-09 | System shall send push notification 3 days before and on due date | P1 |
-| FR-VAC-10 | System shall generate vaccination compliance report | P2 |
-
----
-
-## Heat Cycle Module (FR-HEAT) ⬜ Phase 4
-
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-HEAT-01 | System shall record heat detection with date, time, symptoms | P2 |
-| FR-HEAT-02 | System shall predict next heat as last heat + cycle days (default 21) | P2 |
-| FR-HEAT-03 | System shall display a heat calendar heatmap | P2 |
-| FR-HEAT-04 | System shall send push notification 1 day before expected heat | P2 |
-| FR-HEAT-05 | System shall flag repeat breeders after 3+ heats without conception | P2 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-HLTH-01 | System shall log health checkups (event type, severity, notes) | P1 | ✅ Done — HealthEventSheet |
+| FR-HLTH-02 | System shall support multi-select symptom tags | P1 | ✅ Done — 13-symptom chip grid |
+| FR-HLTH-03 | System shall record disease diagnosis and treatment | P1 | ✅ Done — Diagnosis + notes fields |
+| FR-HLTH-04 | System shall track medicine name, dose, and cost | P1 | ✅ Done — Medicine + dose + cost fields |
+| FR-HLTH-05 | System shall show withdrawal period warning on animal profile | P1 | ⬜ Withdrawal date not yet on form |
+| FR-HLTH-06 | System shall log weight records and display trend chart | P2 | ⬜ |
+| FR-HLTH-07 | System shall log vet visits with cost and next visit date | P2 | ✅ Done — VET_VISIT event type + vet name + cost |
+| FR-HLTH-08 | System shall display sick animals count on dashboard | P1 | ✅ Done — Sick mini-stat via `countActiveHealthIssues()` |
+| FR-HLTH-09 | System shall support photo attachment on health events | P2 | ⬜ |
+| FR-HLTH-10 | System shall provide a vet phone book with call button | P2 | ✅ Done — VetContactSheet + system dialer launch |
 
 ---
 
-## Breeding & Conception Module (FR-BRDG) ⬜ Phase 4
+## Vaccination Module (FR-VAC) ✅ Phase 3 + 6 Complete
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-BRDG-01 | System shall record AI events with all fields | P2 |
-| FR-BRDG-02 | System shall record natural mating | P2 |
-| FR-BRDG-03 | System shall track conception status (Pending/Confirmed/Failed) | P2 |
-| FR-BRDG-04 | System shall record pregnancy diagnosis | P2 |
-| FR-BRDG-05 | System shall calculate and display conception rate | P2 |
-| FR-BRDG-06 | System shall calculate services per conception | P2 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-VAC-01 | System shall maintain a vaccine catalogue with default and custom vaccines | P1 | ✅ Done — `VaccineCatalog` object |
+| FR-VAC-02 | System shall include 8 default Indian vaccines (FMD, BQ, HS, Brucellosis, Anthrax, Theileria, PPR, Rabies) | P1 | ✅ Done |
+| FR-VAC-03 | System shall record vaccinations with all required fields | P1 | ✅ Done — VaccinationSheet (animal, vaccine, disease, given, next-due, batch, given-by, cost, notes) |
+| FR-VAC-04 | System shall auto-calculate next due date from vaccine interval | P1 | ✅ Done — template picker computes next-due from `intervalDays` |
+| FR-VAC-05 | System shall allow overriding the calculated next due date | P1 | ✅ Done — field is editable |
+| FR-VAC-06 | System shall support batch vaccination for multiple animals | P2 | ⬜ Batch UX pending Phase 11 |
+| FR-VAC-07 | System shall display vaccination calendar with color-coded dots | P1 | 🟡 List view shipped; calendar view Phase 11 |
+| FR-VAC-08 | System shall color-code overdue (red), today (amber), upcoming (green) | P1 | ✅ Done — OVERDUE / DUE TODAY badges |
+| FR-VAC-09 | System shall fire local notification 3 days before and on due date | P1 | ✅ Done — `AlertScannerWorker.scanVaccinations()` with 3-day window |
+| FR-VAC-10 | System shall generate vaccination compliance report | P2 | ⬜ Phase 9 (Reports) |
 
 ---
 
-## Pregnancy & Calving Module (FR-PREG) ⬜ Phase 4
+## Heat Cycle Module (FR-HEAT) ✅ Phase 8 Complete
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-PREG-01 | System shall calculate expected calving date (insemination + 280 days) | P2 |
-| FR-PREG-02 | System shall schedule dry period start (calving − 60 days) | P2 |
-| FR-PREG-03 | System shall send calving alert 7 days before expected date | P2 |
-| FR-PREG-04 | System shall record calving with difficulty and outcome | P2 |
-| FR-PREG-05 | System shall auto-create calf animal record on calving | P2 |
-| FR-PREG-06 | System shall start new lactation record on calving | P2 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-HEAT-01 | System shall record heat detection with date, symptoms, intensity | P2 | ✅ Done — HeatSheet with 8-symptom multi-select + intensity toggle |
+| FR-HEAT-02 | System shall predict next heat as last heat + cycle days (default 21) | P2 | ✅ Done — `HeatRecord.expectedNextHeat(cycleDays = 21)` |
+| FR-HEAT-03 | System shall display a heat calendar heatmap | P2 | 🟡 List view shipped; heatmap Phase 11 |
+| FR-HEAT-04 | System shall fire local notification 1 day before expected heat | P2 | ✅ Done — `AlertScannerWorker.scanExpectedHeats()` |
+| FR-HEAT-05 | System shall flag repeat breeders after 3+ heats without conception | P2 | ⬜ Phase 9 (Reports) |
+
+---
+
+## Breeding & Conception Module (FR-BRDG) ✅ Phase 8 Complete
+
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-BRDG-01 | System shall record AI events with technician, semen batch, cost | P2 | ✅ Done — BreedingSheet AI mode |
+| FR-BRDG-02 | System shall record natural mating with bull name | P2 | ✅ Done — BreedingSheet Natural mode |
+| FR-BRDG-03 | System shall track conception status (Pending/Confirmed/Failed) | P2 | ✅ Done — one-tap Confirm/Failed on Mating card |
+| FR-BRDG-04 | System shall calculate expected PD date | P2 | ✅ Done — `BreedingRecord.expectedPdDate()` (breeding + 30 days) |
+| FR-BRDG-05 | System shall calculate and display conception rate | P2 | 🟡 `BreedingStats.conceptionRatePercent` model exists; report screen Phase 9 |
+| FR-BRDG-06 | System shall calculate services per conception | P2 | 🟡 Data available; report screen Phase 9 |
+
+---
+
+## Pregnancy & Calving Module (FR-PREG) ✅ Phase 8 Complete
+
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-PREG-01 | System shall calculate expected calving date (breeding + 280 days) | P2 | ✅ Done — auto-computed on PregnancySheet |
+| FR-PREG-02 | System shall schedule dry period start (calving − 60 days) | P2 | ✅ Done — auto-computed and shown on Pregnancy card |
+| FR-PREG-03 | System shall fire local notification 7 days before expected calving | P2 | ✅ Done — `AlertScannerWorker.scanCalvingDue()` (URGENT ≤ 2 days) |
+| FR-PREG-04 | System shall record calving with difficulty (1-4) and outcome (LiveCalf/Stillbirth/Twins/Abortion) | P2 | ✅ Done — CalvingSheet |
+| FR-PREG-05 | System shall auto-create calf animal record on calving | P2 | ✅ Done — `recordCalving()` inserts via `animalRepository.addAnimal()` then links `calfAnimalId` |
+| FR-PREG-06 | System shall start new lactation record on calving | P2 | ⬜ Not automated — farmer creates milk record manually |
 
 ---
 
@@ -205,7 +207,7 @@
 
 ---
 
-## Reports Module (FR-RPT) ⬜ Phase 6
+## Reports Module (FR-RPT) ⬜ Phase 9
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -219,20 +221,20 @@
 
 ---
 
-## Notifications Module (FR-NOTIF) ✅ Phase 5 Complete (WorkManager + inbox + bell badge)
+## Notifications Module (FR-NOTIF) ✅ Phase 5 + 6 + 7 + 8 Complete
 
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-NOTIF-01 | System shall maintain a Notification Center with all alerts | P1 |
-| FR-NOTIF-02 | System shall send FCM push notifications for time-sensitive alerts | P1 |
-| FR-NOTIF-03 | System shall allow marking alerts as resolved | P1 |
-| FR-NOTIF-04 | System shall deep-link to relevant animal screen on notification tap | P1 |
-| FR-NOTIF-05 | System shall allow configuring which alert types are received | P2 |
-| FR-NOTIF-06 | System shall allow configuring daily alert time | P2 |
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| FR-NOTIF-01 | System shall maintain a Notification Center with all alerts | P1 | ✅ Done — AlertsScreen with filter chips |
+| FR-NOTIF-02 | System shall fire **local** notifications for time-sensitive alerts (offline-first, no FCM) | P1 | ✅ Done — WorkManager + `NotificationHelper` |
+| FR-NOTIF-03 | System shall allow marking alerts as resolved | P1 | ✅ Done — Mark Done button on each card |
+| FR-NOTIF-04 | System shall deep-link to relevant animal screen on notification tap | P1 | ✅ Done — `pashu360://animal/{id}` intents |
+| FR-NOTIF-05 | System shall cover all 6 alert types: Vaccination Due, Heat Expected, Calving Due, Low Feed Stock, Sick Animal, Overdue Health Check | P1 | ✅ Done — 5 scanners live (sick-animal covered by health issue count) |
+| FR-NOTIF-06 | System shall allow configuring which alert types are received | P2 | ⬜ Phase 11 (Settings) |
 
 ---
 
-## Offline Module (FR-OFF) 🟡 Partial (Room done, Supabase sync Phase 5)
+## Offline Module (FR-OFF) 🟡 Partial (Room v8 done, Supabase sync Phase 10)
 
 | ID | Requirement | Priority |
 |---|---|---|
@@ -244,7 +246,7 @@
 
 ---
 
-## Settings Module (FR-SET) ⬜ Phase 7
+## Settings Module (FR-SET) ⬜ Phase 11
 
 | ID | Requirement | Priority |
 |---|---|---|

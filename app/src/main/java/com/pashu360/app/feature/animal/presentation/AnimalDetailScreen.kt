@@ -51,7 +51,9 @@ import com.pashu360.app.core.presentation.theme.PashuAmber
 import com.pashu360.app.core.presentation.theme.PashuGreen
 import com.pashu360.app.core.presentation.theme.PashuGreenDark
 import com.pashu360.app.core.presentation.theme.PashuGreenLight
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +67,15 @@ fun AnimalDetailScreen(
     val vaccinationSheet by viewModel.vaccinationSheet.collectAsStateWithLifecycle()
     val healthSheet by viewModel.healthSheet.collectAsStateWithLifecycle()
     val statusPickerVisible by viewModel.statusPickerVisible.collectAsStateWithLifecycle()
+    val vaccinationHistory by viewModel.vaccinationHistory.collectAsStateWithLifecycle()
+    val healthHistory by viewModel.healthHistory.collectAsStateWithLifecycle()
+    val milkHistory by viewModel.milkHistory.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val today = remember {
+        @OptIn(ExperimentalTime::class)
+        kotlin.time.Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
 
     val currentStatus = animal?.status
     if (statusPickerVisible && currentStatus != null) {
@@ -238,12 +248,19 @@ fun AnimalDetailScreen(
             ) {
                 when (selectedTab) {
                     0 -> OverviewTab(a)
-                    1 -> TabPlaceholder("Milk", "Milk history and analytics for ${a.displayName}",
-                        Icons.Filled.LocalDrink)
-                    2 -> TabPlaceholder("Vaccination", "Vaccination schedule and history",
-                        Icons.Filled.Vaccines)
-                    3 -> TabPlaceholder("Health", "Health records and vet visits",
-                        Icons.Filled.Favorite)
+                    1 -> MilkHistoryTab(
+                        records = milkHistory,
+                        onAddClick = viewModel::openMilkSheet
+                    )
+                    2 -> VaccinationHistoryTab(
+                        vaccinations = vaccinationHistory,
+                        today = today,
+                        onAddClick = viewModel::openVaccinationSheet
+                    )
+                    3 -> HealthHistoryTab(
+                        records = healthHistory,
+                        onAddClick = viewModel::openHealthSheet
+                    )
                     4 -> TabPlaceholder("Feeding", "Feeding schedule and logs",
                         Icons.Filled.Grass)
                     5 -> TabPlaceholder("Breeding", "Heat cycles, AI records, and pregnancy",
@@ -1097,4 +1114,210 @@ private fun SheetDateField(
 private fun pickedDateFromMillis(millis: Long): kotlinx.datetime.LocalDate {
     val instant = kotlin.time.Instant.fromEpochMilliseconds(millis)
     return instant.toLocalDateTime(kotlinx.datetime.TimeZone.UTC).date
+}
+
+// ─────────────────────────────────────────────────────────
+// PER-ANIMAL HISTORY TABS
+// ─────────────────────────────────────────────────────────
+
+@Composable
+private fun MilkHistoryTab(
+    records: List<com.pashu360.app.core.domain.model.MilkRecord>,
+    onAddClick: () -> Unit
+) {
+    if (records.isEmpty()) {
+        AnimalEmptyPane(
+            emoji = "🥛",
+            title = "No milk records yet",
+            subtitle = "Tap Log Milk above to record today's yield.",
+            onAction = onAddClick,
+            actionLabel = "Log Milk"
+        )
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Recent Milk Records (${records.size})",
+            fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        records.forEach { r ->
+            HistoryRow(
+                emoji = "🥛",
+                title = "%.1f L".format(r.quantityLiters),
+                subtitle = "${r.session.displayName} • ${r.recordDate}",
+                extra = listOfNotNull(
+                    r.fatPct?.let { "Fat %.1f%%".format(it) },
+                    r.snfPct?.let { "SNF %.1f%%".format(it) }
+                ).joinToString(" · ").ifBlank { null }
+            )
+        }
+    }
+}
+
+@Composable
+private fun VaccinationHistoryTab(
+    vaccinations: List<com.pashu360.app.core.domain.model.Vaccination>,
+    today: kotlinx.datetime.LocalDate,
+    onAddClick: () -> Unit
+) {
+    if (vaccinations.isEmpty()) {
+        AnimalEmptyPane(
+            emoji = "💉",
+            title = "No vaccinations yet",
+            subtitle = "Tap Vaccine above to record a shot. Preset chips include FMD, LSD, BQ, HS, and more.",
+            onAction = onAddClick,
+            actionLabel = "Add Vaccine"
+        )
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Vaccinations (${vaccinations.size})",
+            fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        vaccinations.forEach { v ->
+            val badge = when {
+                v.nextDueDate == null -> null
+                v.nextDueDate < today -> "OVERDUE" to ColorSick
+                v.nextDueDate == today -> "DUE TODAY" to PashuAmber
+                else -> null
+            }
+            HistoryRow(
+                emoji = "💉",
+                title = v.vaccineName,
+                subtitle = "Given ${v.administeredDate}" +
+                    (v.nextDueDate?.let { " • Next due $it" } ?: ""),
+                extra = listOfNotNull(
+                    v.diseaseTarget,
+                    v.administeredBy?.let { "By $it" },
+                    v.batchNumber?.let { "Batch $it" }
+                ).joinToString(" · ").ifBlank { null },
+                badge = badge?.first,
+                badgeColor = badge?.second
+            )
+        }
+    }
+}
+
+@Composable
+private fun HealthHistoryTab(
+    records: List<com.pashu360.app.core.domain.model.HealthRecord>,
+    onAddClick: () -> Unit
+) {
+    if (records.isEmpty()) {
+        AnimalEmptyPane(
+            emoji = "🩺",
+            title = "No health records yet",
+            subtitle = "Tap Health above to log a checkup, disease, injury, or vet visit.",
+            onAction = onAddClick,
+            actionLabel = "Log Health"
+        )
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Health Events (${records.size})",
+            fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        records.forEach { r ->
+            val severityColor = when (r.severity) {
+                com.pashu360.app.core.domain.model.Severity.MILD -> PashuGreen
+                com.pashu360.app.core.domain.model.Severity.MODERATE -> PashuAmber
+                com.pashu360.app.core.domain.model.Severity.SEVERE -> ColorSick
+            }
+            HistoryRow(
+                emoji = r.eventType.emoji,
+                title = r.diagnosis?.takeIf { it.isNotBlank() } ?: r.eventType.displayName,
+                subtitle = "${r.eventDate} • ${r.severity.displayName}",
+                extra = listOfNotNull(
+                    r.symptoms.takeIf { it.isNotEmpty() }?.joinToString(", "),
+                    r.medicineName?.let { "💊 $it" }
+                ).joinToString(" · ").ifBlank { null },
+                accent = severityColor
+            )
+        }
+    }
+}
+
+@Composable
+private fun HistoryRow(
+    emoji: String,
+    title: String,
+    subtitle: String,
+    extra: String? = null,
+    badge: String? = null,
+    badgeColor: Color? = null,
+    accent: Color = PashuGreen
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(1.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Box(
+                modifier = Modifier.size(4.dp, 44.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(accent)
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(emoji, fontSize = 20.sp)
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(subtitle, fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium)
+                extra?.let {
+                    Text(it, fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2)
+                }
+            }
+            if (badge != null && badgeColor != null) {
+                Surface(color = badgeColor, shape = RoundedCornerShape(6.dp)) {
+                    Text(badge,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimalEmptyPane(
+    emoji: String,
+    title: String,
+    subtitle: String,
+    onAction: () -> Unit,
+    actionLabel: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier.size(80.dp).clip(CircleShape)
+                .background(PashuGreen.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(emoji, fontSize = 40.sp)
+        }
+        Spacer(Modifier.height(12.dp))
+        Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(6.dp))
+        Text(subtitle, fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Spacer(Modifier.height(14.dp))
+        Button(
+            onClick = onAction,
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = PashuGreen)
+        ) {
+            Text(actionLabel, color = Color.White, fontWeight = FontWeight.SemiBold)
+        }
+    }
 }

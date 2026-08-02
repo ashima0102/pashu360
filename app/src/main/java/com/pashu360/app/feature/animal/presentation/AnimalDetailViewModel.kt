@@ -109,6 +109,21 @@ class AnimalDetailViewModel @Inject constructor(
         null
     )
 
+    val vaccinationHistory: StateFlow<List<Vaccination>> =
+        healthRepository.observeVaccinationsForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
+    val healthHistory: StateFlow<List<HealthRecord>> =
+        healthRepository.observeHealthRecordsForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
+    val milkHistory: StateFlow<List<com.pashu360.app.core.domain.model.MilkRecord>> =
+        milkRepository.observeRecordsForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
     private val _milkSheet = MutableStateFlow(QuickMilkSheetState())
     val milkSheet: StateFlow<QuickMilkSheetState> = _milkSheet.asStateFlow()
 

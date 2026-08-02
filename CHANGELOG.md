@@ -14,6 +14,52 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.3] — 2026-08-02 · Farmer polish: LSD, Transition Feed, editable status ✅
+
+Farmer-requested tweaks after live testing the setup.
+
+### Added
+- **LSD Vaccine** (Lumpy Skin Disease, 365-day interval) added to `VaccineCatalog` —
+  appears as a preset chip in the Add Vaccination sheet
+- **Transition Feed** added to `FeedTypeCatalog.defaults()` as a
+  concentrate-category feed type
+- **Status picker** on AddAnimalScreen — chips for Active / Pregnant / Dry / Sick
+  (default Active). No more add-then-edit for animals that arrive pregnant or sick.
+- **Change Status dialog** on AnimalDetail — the header status badge is now
+  tappable; opens an AlertDialog with all 6 statuses including Deceased.
+  Marks a died animal as inactive instead of requiring deletion.
+- **`AnimalDao.observeInactive()`** new query — returns animals with
+  `status IN ('sold', 'deceased')` for the new Inactive filter chip
+- `AnimalDetailViewModel` now injects `AnimalRepository` +
+  `openStatusPicker()` / `closeStatusPicker()` / `changeStatus()`
+
+### Changed
+- `AnimalFilter.SOLD` → `AnimalFilter.INACTIVE` (umbrella for sold + deceased) —
+  farmer's mental model is "alive on farm" vs "not on farm anymore"
+- All Animal DAO queries changed from `ORDER BY tag_id ASC` to `ORDER BY tag_id DESC` —
+  newest animal appears at the top of every list
+
+Merged via PR #14 — commit on main
+
+---
+
+## [0.9.2] — 2026-08-02 · Fix: Home navigation from drawer destinations ✅
+
+### Fixed
+- ComingSoonScreen had no app bar → tapping Farm Info / Reports / Settings /
+  Help / Profile from the drawer left the user with no visible way home
+  (bottom nav hidden, drawer gestures disabled, no back arrow)
+- ComingSoonScreen now renders the standard green `PashuAppBar` header with
+  menu / bell / profile icons and a hint line
+- MainScaffold passes `alertCount` + menu/bell/profile callbacks to every
+  ComingSoon destination
+- Drawer swipe gesture is now enabled on drawer destinations too, not just
+  the 5 bottom-nav tabs
+
+Merged via PR #13 — commit on main
+
+---
+
 ## [0.9.1] — 2026-08-02 · Farm persistence + live Dashboard header ✅
 
 Merged along with Phase 8 (PR #11) after the merge-cascade rebase.

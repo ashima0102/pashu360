@@ -251,7 +251,27 @@ Planned:
 | Screens built (functional) | 22+ of 32 (~69%) |
 | Modules complete | 8 of 11 (~73%) |
 | Room DB version | 8 |
-| Merged PRs | 11 |
+| Merged PRs | 14 |
+
+---
+
+## Follow-up polish (post-Phase-8)
+
+**PR #12** — docs sync after Phase 6/7/8 merges
+
+**PR #13** — Home navigation from drawer destinations (bugfix)
+- ComingSoonScreen now has an app bar so the drawer stays reachable
+  from Farm Info / Reports / Settings / Help / Profile
+- Drawer swipe gesture enabled on drawer destinations
+
+**PR #14** — Farmer polish
+- **LSD Vaccine** added to preset catalog
+- **Transition Feed** added to default feed types
+- **Animal status picker** on AddAnimalScreen (Active/Pregnant/Dry/Sick)
+- **Change Status dialog** on AnimalDetail — tap the status badge; picks
+  from all six statuses including Deceased
+- `AnimalFilter.SOLD` → `INACTIVE` (umbrella for sold + deceased)
+- All Animal list queries now `ORDER BY tag_id DESC` — newest first
 
 ---
 
@@ -259,4 +279,4 @@ Planned:
 
 - **GitHub:** https://github.com/ashima0102/pashu360
 - **Default branch:** `main` (branch-protected, PR-only)
-- **Latest commit:** `88fd34b` — Phase 8: Breeding, Pregnancy & Calving (PR #11)
+- **Latest merged PR:** #14 — Farmer polish (LSD, Transition Feed, editable status)

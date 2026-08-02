@@ -112,7 +112,7 @@
 | ID | Requirement | Priority | Status |
 |---|---|---|---|
 | FR-FEED-01 | System shall maintain a farm-level feed type catalogue | P1 | ✅ Done — `feed_types` table + `FeedType` domain |
-| FR-FEED-02 | System shall include default feed types (green fodder, dry fodder, concentrate, mineral, water) | P1 | ✅ Done — seeded via FeedingRepository |
+| FR-FEED-02 | System shall include default feed types (green fodder, dry fodder, concentrate, transition feed, mineral) | P1 | ✅ Done — seeded via FeedingRepository |
 | FR-FEED-03 | System shall allow logging feed per animal or per herd | P1 | ✅ Done — FeedingScreen log tab |
 | FR-FEED-04 | System shall support three feeding times | P2 | ✅ Done — Morning/Afternoon/Evening enum |
 | FR-FEED-05 | System shall track feed inventory stock levels | P2 | ✅ Done — `feed_inventory` table with quantity + unit |
@@ -144,7 +144,7 @@
 | ID | Requirement | Priority | Status |
 |---|---|---|---|
 | FR-VAC-01 | System shall maintain a vaccine catalogue with default and custom vaccines | P1 | ✅ Done — `VaccineCatalog` object |
-| FR-VAC-02 | System shall include 8 default Indian vaccines (FMD, BQ, HS, Brucellosis, Anthrax, Theileria, PPR, Rabies) | P1 | ✅ Done |
+| FR-VAC-02 | System shall include 9 default Indian vaccines (FMD, LSD, BQ, HS, Brucellosis, Anthrax, Theileria, PPR, Rabies) | P1 | ✅ Done |
 | FR-VAC-03 | System shall record vaccinations with all required fields | P1 | ✅ Done — VaccinationSheet (animal, vaccine, disease, given, next-due, batch, given-by, cost, notes) |
 | FR-VAC-04 | System shall auto-calculate next due date from vaccine interval | P1 | ✅ Done — template picker computes next-due from `intervalDays` |
 | FR-VAC-05 | System shall allow overriding the calculated next due date | P1 | ✅ Done — field is editable |

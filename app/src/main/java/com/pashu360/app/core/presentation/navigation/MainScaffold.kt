@@ -82,6 +82,15 @@ fun MainScaffold(
     val currentRoute = backStackEntry?.destination?.route
     val showBottomNav = currentRoute in bottomNavItems.map { it.screen.route }
 
+    // Drawer swipe should also work on drawer destinations so the farmer can
+    // swipe back to Home without needing the menu icon.
+    val drawerDestinationRoutes = setOf(
+        Screen.FarmInfo.route, Screen.Feeding.route, Screen.Breeding.route,
+        Screen.Pregnancy.route, Screen.Reports.route, Screen.Settings.route,
+        Screen.Help.route, Screen.Profile.route
+    )
+    val allowDrawerGesture = showBottomNav || currentRoute in drawerDestinationRoutes
+
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -112,7 +121,7 @@ fun MainScaffold(
                 }
             )
         },
-        gesturesEnabled = showBottomNav   // Drawer only opens from top-level screens
+        gesturesEnabled = allowDrawerGesture   // Also allowed on drawer destinations
     ) {
         Scaffold(
             bottomBar = {
@@ -218,7 +227,11 @@ fun MainScaffold(
                     ComingSoonScreen(
                         title = "Profile",
                         subtitle = "Edit your name, phone, photo. Manage account preferences.",
-                        icon = Icons.Filled.Settings
+                        icon = Icons.Filled.Settings,
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 
@@ -227,7 +240,11 @@ fun MainScaffold(
                     ComingSoonScreen(
                         title = "Farm Info",
                         subtitle = "Edit your farm details: name, location, GPS, barns.",
-                        icon = Icons.Filled.Home
+                        icon = Icons.Filled.Home,
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 composable(Screen.Feeding.route) {
@@ -258,21 +275,33 @@ fun MainScaffold(
                     ComingSoonScreen(
                         title = "Reports",
                         subtitle = "Milk, health, vaccination, financial reports. Export as PDF/CSV.",
-                        icon = Icons.Filled.Home
+                        icon = Icons.Filled.Home,
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 composable(Screen.Settings.route) {
                     ComingSoonScreen(
                         title = "Settings",
                         subtitle = "Language, theme, notifications, backup and data export.",
-                        icon = Icons.Filled.Settings
+                        icon = Icons.Filled.Settings,
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 composable(Screen.Help.route) {
                     ComingSoonScreen(
                         title = "Help & Support",
                         subtitle = "FAQs, contact support, and user guides.",
-                        icon = Icons.Filled.Settings
+                        icon = Icons.Filled.Settings,
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
 

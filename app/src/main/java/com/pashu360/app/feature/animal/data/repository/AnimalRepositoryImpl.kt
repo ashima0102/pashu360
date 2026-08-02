@@ -35,7 +35,7 @@ class AnimalRepositoryImpl @Inject constructor(
             AnimalFilter.PREGNANT -> dao.observeByStatus(farmId, "pregnant")
             AnimalFilter.SICK -> dao.observeByStatus(farmId, "sick")
             AnimalFilter.DRY -> dao.observeByStatus(farmId, "dry")
-            AnimalFilter.SOLD -> dao.observeByStatus(farmId, "sold")
+            AnimalFilter.INACTIVE -> dao.observeInactive(farmId)
         }
         return flow.map { list -> list.map { it.toDomain() } }
     }

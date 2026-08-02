@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pashu360.app.core.data.SessionStore
 import com.pashu360.app.core.domain.model.Animal
+import com.pashu360.app.core.domain.model.AnimalStatus
 import com.pashu360.app.core.domain.model.HealthEventType
 import com.pashu360.app.core.domain.model.HealthRecord
 import com.pashu360.app.core.domain.model.MilkSession
 import com.pashu360.app.core.domain.model.Severity
 import com.pashu360.app.core.domain.model.Vaccination
 import com.pashu360.app.core.domain.model.VaccineTemplate
+import com.pashu360.app.feature.animal.domain.repository.AnimalRepository
 import com.pashu360.app.feature.animal.domain.usecase.GetAnimalByIdUseCase
 import com.pashu360.app.feature.health.domain.repository.HealthRepository
 import com.pashu360.app.feature.milk.domain.repository.BulkEntryInput
@@ -81,6 +83,7 @@ sealed class AnimalDetailEvent {
     data class MilkSaved(val litres: Double) : AnimalDetailEvent()
     data class VaccinationSaved(val name: String) : AnimalDetailEvent()
     data class HealthSaved(val diagnosis: String?) : AnimalDetailEvent()
+    data class StatusChanged(val status: AnimalStatus) : AnimalDetailEvent()
     data class ShowError(val message: String) : AnimalDetailEvent()
 }
 
@@ -88,6 +91,7 @@ sealed class AnimalDetailEvent {
 @HiltViewModel
 class AnimalDetailViewModel @Inject constructor(
     private val getAnimalByIdUseCase: GetAnimalByIdUseCase,
+    private val animalRepository: AnimalRepository,
     private val milkRepository: MilkRepository,
     private val healthRepository: HealthRepository,
     private val alertScheduler: AlertScheduler,
@@ -118,8 +122,27 @@ class AnimalDetailViewModel @Inject constructor(
     )
     val healthSheet: StateFlow<QuickHealthEventState> = _healthSheet.asStateFlow()
 
+    private val _statusPickerVisible = MutableStateFlow(false)
+    val statusPickerVisible: StateFlow<Boolean> = _statusPickerVisible.asStateFlow()
+
     private val _events = Channel<AnimalDetailEvent>()
     val events = _events.receiveAsFlow()
+
+    fun openStatusPicker() { _statusPickerVisible.value = true }
+    fun closeStatusPicker() { _statusPickerVisible.value = false }
+
+    fun changeStatus(status: AnimalStatus) {
+        viewModelScope.launch {
+            animalRepository.updateStatus(animalId, status.value)
+                .onSuccess {
+                    _statusPickerVisible.value = false
+                    _events.send(AnimalDetailEvent.StatusChanged(status))
+                }
+                .onFailure { e ->
+                    _events.send(AnimalDetailEvent.ShowError(e.message ?: "Could not update status"))
+                }
+        }
+    }
 
     private val farmId get() = sessionStore.getActiveFarmId()
 

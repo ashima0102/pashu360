@@ -32,10 +32,11 @@ enum class FeedCategory(val value: String, val displayName: String, val emoji: S
 /** Default feed types created on first launch. */
 object FeedTypeCatalog {
     fun defaults(farmId: String): List<FeedType> = listOf(
-        FeedType(farmId = farmId, name = "Green Fodder",   category = FeedCategory.GREEN_FODDER, costPerUnit = 5.0),
-        FeedType(farmId = farmId, name = "Dry Fodder",     category = FeedCategory.DRY_FODDER, costPerUnit = 12.0),
-        FeedType(farmId = farmId, name = "Concentrate Mix",category = FeedCategory.CONCENTRATE, costPerUnit = 32.0),
-        FeedType(farmId = farmId, name = "Mineral Mix",    category = FeedCategory.MINERAL_MIX, unit = "g", costPerUnit = 0.5),
+        FeedType(farmId = farmId, name = "Green Fodder",     category = FeedCategory.GREEN_FODDER, costPerUnit = 5.0),
+        FeedType(farmId = farmId, name = "Dry Fodder",       category = FeedCategory.DRY_FODDER, costPerUnit = 12.0),
+        FeedType(farmId = farmId, name = "Concentrate Mix",  category = FeedCategory.CONCENTRATE, costPerUnit = 32.0),
+        FeedType(farmId = farmId, name = "Transition Feed",  category = FeedCategory.CONCENTRATE, costPerUnit = 28.0),
+        FeedType(farmId = farmId, name = "Mineral Mix",      category = FeedCategory.MINERAL_MIX, unit = "g", costPerUnit = 0.5),
     )
 }
 

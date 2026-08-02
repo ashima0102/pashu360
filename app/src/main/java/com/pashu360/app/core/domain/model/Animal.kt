@@ -85,7 +85,7 @@ enum class AnimalFilter(val displayName: String) {
     PREGNANT("Pregnant"),
     SICK("Sick"),
     DRY("Dry"),
-    SOLD("Sold")
+    INACTIVE("Inactive")    // sold + deceased
 }
 
 // Common Indian dairy breeds

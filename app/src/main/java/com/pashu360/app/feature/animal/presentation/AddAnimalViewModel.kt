@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pashu360.app.core.data.SessionStore
 import com.pashu360.app.core.domain.model.Animal
+import com.pashu360.app.core.domain.model.AnimalStatus
 import com.pashu360.app.core.domain.model.Gender
 import com.pashu360.app.feature.animal.domain.usecase.AddAnimalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ data class AddAnimalUiState(
     val name: String = "",
     val breed: String = "",
     val gender: Gender = Gender.FEMALE,
+    val status: AnimalStatus = AnimalStatus.ACTIVE,
     val dob: LocalDate? = null,
     val weight: String = "",
     val purchasePrice: String = "",
@@ -55,6 +57,7 @@ class AddAnimalViewModel @Inject constructor(
     fun onNameChanged(value: String) { _uiState.update { it.copy(name = value) } }
     fun onBreedChanged(value: String) { _uiState.update { it.copy(breed = value) } }
     fun onGenderChanged(value: Gender) { _uiState.update { it.copy(gender = value) } }
+    fun onStatusChanged(value: AnimalStatus) { _uiState.update { it.copy(status = value) } }
     fun onDobChanged(value: LocalDate?) { _uiState.update { it.copy(dob = value) } }
     fun onWeightChanged(value: String) {
         _uiState.update { it.copy(weight = value.filter { c -> c.isDigit() || c == '.' }) }
@@ -80,6 +83,7 @@ class AddAnimalViewModel @Inject constructor(
                 name = state.name.takeIf { it.isNotBlank() },
                 breed = state.breed.takeIf { it.isNotBlank() },
                 gender = state.gender,
+                status = state.status,
                 dob = state.dob,
                 weightKg = state.weight.toDoubleOrNull(),
                 purchasePrice = state.purchasePrice.toDoubleOrNull(),

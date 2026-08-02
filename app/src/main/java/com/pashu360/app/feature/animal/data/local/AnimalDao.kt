@@ -14,7 +14,7 @@ interface AnimalDao {
         SELECT * FROM animals
         WHERE farm_id = :farmId
         AND status NOT IN ('sold', 'deceased')
-        ORDER BY tag_id ASC
+        ORDER BY tag_id DESC
     """)
     fun observeActiveAnimals(farmId: String): Flow<List<AnimalEntity>>
 
@@ -22,12 +22,21 @@ interface AnimalDao {
         SELECT * FROM animals
         WHERE farm_id = :farmId
         AND status = :status
-        ORDER BY tag_id ASC
+        ORDER BY tag_id DESC
     """)
     fun observeByStatus(farmId: String, status: String): Flow<List<AnimalEntity>>
 
-    @Query("SELECT * FROM animals WHERE farm_id = :farmId ORDER BY tag_id ASC")
+    @Query("SELECT * FROM animals WHERE farm_id = :farmId ORDER BY tag_id DESC")
     fun observeAll(farmId: String): Flow<List<AnimalEntity>>
+
+    /** Alias for the "Inactive" filter chip — deceased + sold animals. */
+    @Query("""
+        SELECT * FROM animals
+        WHERE farm_id = :farmId
+        AND status IN ('sold', 'deceased')
+        ORDER BY tag_id DESC
+    """)
+    fun observeInactive(farmId: String): Flow<List<AnimalEntity>>
 
     // Non-suspend @Query methods work around a KSP2 bug where suspend @Query
     // methods aren't emitted into the generated DAO_Impl. Callers dispatch

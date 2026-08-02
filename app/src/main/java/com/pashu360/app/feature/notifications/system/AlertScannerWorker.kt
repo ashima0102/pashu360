@@ -15,6 +15,7 @@ import com.pashu360.app.core.domain.model.Alert
 import com.pashu360.app.core.domain.model.AlertPriority
 import com.pashu360.app.core.domain.model.AlertType
 import com.pashu360.app.feature.animal.domain.repository.AnimalRepository
+import com.pashu360.app.feature.feeding.domain.repository.FeedingRepository
 import com.pashu360.app.feature.health.domain.repository.HealthRepository
 import com.pashu360.app.feature.notifications.domain.repository.AlertRepository
 import dagger.assisted.Assisted
@@ -46,6 +47,7 @@ class AlertScannerWorker @AssistedInject constructor(
     private val alertRepo: AlertRepository,
     private val healthRepo: HealthRepository,
     private val animalRepo: AnimalRepository,
+    private val feedingRepo: FeedingRepository,
     private val notificationHelper: NotificationHelper
 ) : CoroutineWorker(context, params) {
 
@@ -56,6 +58,7 @@ class AlertScannerWorker @AssistedInject constructor(
                 .toLocalDateTime(TimeZone.currentSystemDefault()).date
 
             scanVaccinations(farmId, today)
+            scanLowFeedStock(farmId, today)
             fireDueNotifications(farmId, today)
             cleanupOldResolved(today)
 
@@ -100,6 +103,33 @@ class AlertScannerWorker @AssistedInject constructor(
                 dueDate = next,
                 priority = priority,
                 sourceId = v.id,
+                createdAt = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+            )
+            alertRepo.insertOrIgnore(alert)
+        }
+    }
+
+    /**
+     * Scan feed inventory for items below their low-stock threshold and generate
+     * LOW_FEED_STOCK alerts (deduped via (farm + type + date) since sourceId
+     * doesn't cleanly map to inventory rows).
+     */
+    private suspend fun scanLowFeedStock(farmId: String, today: LocalDate) {
+        val lowStock = feedingRepo.getLowStockInventory(farmId)
+        lowStock.forEach { row ->
+            val alert = Alert(
+                farmId = farmId,
+                animalId = row.inventory.feedTypeId,   // reuse for dedupe key
+                alertType = AlertType.LOW_FEED_STOCK,
+                title = "Low stock: ${row.feedTypeName}",
+                message = "Only %.1f ${row.feedTypeUnit} left · threshold %.0f".format(
+                    row.inventory.quantity, row.inventory.lowStockThreshold
+                ),
+                dueDate = today,
+                priority = if (row.inventory.quantity <= 0.0) AlertPriority.URGENT
+                           else AlertPriority.HIGH,
+                sourceId = "feed:${row.inventory.feedTypeId}:${today}",
                 createdAt = Clock.System.now()
                     .toLocalDateTime(TimeZone.currentSystemDefault())
             )

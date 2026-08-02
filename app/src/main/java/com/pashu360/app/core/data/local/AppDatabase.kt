@@ -4,6 +4,12 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.pashu360.app.feature.animal.data.local.AnimalDao
 import com.pashu360.app.feature.animal.data.local.AnimalEntity
+import com.pashu360.app.feature.feeding.data.local.FeedInventoryDao
+import com.pashu360.app.feature.feeding.data.local.FeedInventoryEntity
+import com.pashu360.app.feature.feeding.data.local.FeedRecordDao
+import com.pashu360.app.feature.feeding.data.local.FeedRecordEntity
+import com.pashu360.app.feature.feeding.data.local.FeedTypeDao
+import com.pashu360.app.feature.feeding.data.local.FeedTypeEntity
 import com.pashu360.app.feature.finance.data.local.FinancialRecordDao
 import com.pashu360.app.feature.finance.data.local.FinancialRecordEntity
 import com.pashu360.app.feature.health.data.local.HealthRecordDao
@@ -26,8 +32,11 @@ import com.pashu360.app.feature.notifications.data.local.AlertEntity
         VetContactEntity::class,
         FinancialRecordEntity::class,
         AlertEntity::class,
+        FeedTypeEntity::class,
+        FeedRecordEntity::class,
+        FeedInventoryEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -38,6 +47,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun vetContactDao(): VetContactDao
     abstract fun financialRecordDao(): FinancialRecordDao
     abstract fun alertDao(): AlertDao
+    abstract fun feedTypeDao(): FeedTypeDao
+    abstract fun feedRecordDao(): FeedRecordDao
+    abstract fun feedInventoryDao(): FeedInventoryDao
 
     companion object {
         const val DATABASE_NAME = "pashu360.db"

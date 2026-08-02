@@ -45,6 +45,7 @@ import com.pashu360.app.feature.animal.presentation.AnimalDetailScreen
 import com.pashu360.app.feature.animal.presentation.AnimalListScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
+import com.pashu360.app.feature.feeding.presentation.FeedingScreen
 import com.pashu360.app.feature.finance.presentation.FinanceScreen
 import com.pashu360.app.feature.health.presentation.HealthScreen
 import com.pashu360.app.feature.milk.presentation.MilkScreen
@@ -222,10 +223,11 @@ fun MainScaffold(
                     )
                 }
                 composable(Screen.Feeding.route) {
-                    ComingSoonScreen(
-                        title = "Feeding",
-                        subtitle = "Log feed schedules, inventory, and per-animal feed cost.",
-                        icon = Icons.Filled.Grass
+                    FeedingScreen(
+                        alertCount = alertCount,
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onBellClick = { navController.navigate(Screen.Alerts.route) },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 composable(Screen.Breeding.route) {

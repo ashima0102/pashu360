@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Agriculture
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,12 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import android.widget.Toast
 import com.pashu360.app.core.presentation.theme.Pashu360Theme
 import com.pashu360.app.core.presentation.theme.PashuAmber
 import com.pashu360.app.core.presentation.theme.PashuGreen
@@ -33,14 +38,21 @@ import com.pashu360.app.core.presentation.theme.PashuGreenLight
 
 @Composable
 fun FarmSetupScreen(
-    onFarmCreated: () -> Unit
+    onFarmCreated: () -> Unit,
+    viewModel: FarmSetupViewModel = hiltViewModel()
 ) {
-    var farmName by remember { mutableStateOf("") }
-    var village by remember { mutableStateOf("") }
-    var state by remember { mutableStateOf("") }
-    var animalCount by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    val isValid = farmName.isNotBlank() && village.isNotBlank()
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is FarmSetupEvent.Saved -> onFarmCreated()
+                is FarmSetupEvent.ShowError ->
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
 
@@ -154,9 +166,19 @@ fun FarmSetupScreen(
                     Spacer(Modifier.height(24.dp))
 
                     Field(
+                        label = "Your Name",
+                        value = uiState.ownerName,
+                        onChange = viewModel::onOwnerNameChanged,
+                        placeholder = "Ramesh Sharma",
+                        leading = { Icon(Icons.Filled.Person, null, tint = PashuGreen) }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Field(
                         label = "Farm Name",
-                        value = farmName,
-                        onChange = { farmName = it },
+                        value = uiState.farmName,
+                        onChange = viewModel::onFarmNameChanged,
                         placeholder = "Sharma Dairy Farm",
                         leading = { Icon(Icons.Filled.Agriculture, null, tint = PashuGreen) }
                     )
@@ -165,8 +187,8 @@ fun FarmSetupScreen(
 
                     Field(
                         label = "Village / City",
-                        value = village,
-                        onChange = { village = it },
+                        value = uiState.village,
+                        onChange = viewModel::onVillageChanged,
                         placeholder = "Bhubaneswar",
                         leading = { Icon(Icons.Filled.LocationOn, null, tint = PashuGreen) }
                     )
@@ -175,8 +197,8 @@ fun FarmSetupScreen(
 
                     Field(
                         label = "State (optional)",
-                        value = state,
-                        onChange = { state = it },
+                        value = uiState.state,
+                        onChange = viewModel::onStateChanged,
                         placeholder = "Odisha"
                     )
 
@@ -184,8 +206,8 @@ fun FarmSetupScreen(
 
                     Field(
                         label = "How many animals? (approx)",
-                        value = animalCount,
-                        onChange = { animalCount = it.filter { c -> c.isDigit() }.take(4) },
+                        value = uiState.expectedHerdSize,
+                        onChange = viewModel::onHerdSizeChanged,
                         placeholder = "25",
                         leading = { Icon(Icons.Filled.Pets, null, tint = PashuGreen) },
                         keyboardType = KeyboardType.Number
@@ -194,8 +216,8 @@ fun FarmSetupScreen(
                     Spacer(Modifier.height(32.dp))
 
                     Button(
-                        onClick = onFarmCreated,
-                        enabled = isValid,
+                        onClick = viewModel::save,
+                        enabled = uiState.isValid && !uiState.isSaving,
                         modifier = Modifier.fillMaxWidth().height(60.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(

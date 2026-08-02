@@ -1,0 +1,88 @@
+package com.pashu360.app.feature.auth.presentation
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.pashu360.app.core.data.SessionStore
+import com.pashu360.app.core.domain.model.Farm
+import com.pashu360.app.feature.farm.domain.repository.FarmRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+
+data class FarmSetupUiState(
+    val ownerName: String = "",
+    val farmName: String = "",
+    val village: String = "",
+    val state: String = "",
+    val expectedHerdSize: String = "",
+    val isSaving: Boolean = false
+) {
+    val isValid: Boolean
+        get() = ownerName.isNotBlank() &&
+                farmName.isNotBlank() &&
+                village.isNotBlank()
+}
+
+sealed class FarmSetupEvent {
+    object Saved : FarmSetupEvent()
+    data class ShowError(val message: String) : FarmSetupEvent()
+}
+
+@OptIn(ExperimentalTime::class)
+@HiltViewModel
+class FarmSetupViewModel @Inject constructor(
+    private val farmRepository: FarmRepository,
+    private val sessionStore: SessionStore
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        FarmSetupUiState(ownerName = sessionStore.consumePendingOwnerName())
+    )
+    val uiState: StateFlow<FarmSetupUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<FarmSetupEvent>()
+    val events = _events.receiveAsFlow()
+
+    fun onOwnerNameChanged(v: String) { _uiState.update { it.copy(ownerName = v) } }
+    fun onFarmNameChanged(v: String) { _uiState.update { it.copy(farmName = v) } }
+    fun onVillageChanged(v: String) { _uiState.update { it.copy(village = v) } }
+    fun onStateChanged(v: String) { _uiState.update { it.copy(state = v) } }
+    fun onHerdSizeChanged(v: String) {
+        _uiState.update { it.copy(expectedHerdSize = v.filter { c -> c.isDigit() }.take(4)) }
+    }
+
+    fun save() {
+        val s = _uiState.value
+        if (!s.isValid) return
+        _uiState.update { it.copy(isSaving = true) }
+
+        viewModelScope.launch {
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val farm = Farm(
+                id = sessionStore.getActiveFarmId(),
+                ownerName = s.ownerName.trim(),
+                farmName = s.farmName.trim(),
+                village = s.village.trim(),
+                state = s.state.trim(),
+                expectedHerdSize = s.expectedHerdSize.toIntOrNull() ?: 0,
+                createdAt = now
+            )
+            farmRepository.saveFarm(farm)
+                .onSuccess { _events.send(FarmSetupEvent.Saved) }
+                .onFailure {
+                    _uiState.update { it.copy(isSaving = false) }
+                    _events.send(FarmSetupEvent.ShowError(it.message ?: "Failed to save"))
+                }
+        }
+    }
+}

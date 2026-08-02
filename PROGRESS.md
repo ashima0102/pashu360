@@ -15,14 +15,14 @@
 | **Phase 3** — Health Management (records + vaccinations + vet contacts) | ✅ Done | 100% |
 | **Phase 4** — Finance Management | ✅ Done | 100% |
 | **Phase 5** — Alerts + Local Notifications (WorkManager) | ✅ Done | 100% |
-| **Phase 6** — Health add-forms + alert scheduler triggers | ✅ Done (PR #9 open) | 100% |
-| **Phase 7** — Feeding module | ✅ Done (this PR) | 100% |
-| **Phase 8** — Breeding + Pregnancy | ⬜ Not started | 0% |
+| **Phase 6** — Health add-forms + alert scheduler triggers | ✅ Done | 100% |
+| **Phase 7** — Feeding management | ✅ Done | 100% |
+| **Phase 8** — Breeding + Pregnancy + Calving | ✅ Done | 100% |
 | **Phase 9** — Reports + PDF/CSV export | ⬜ Not started | 0% |
 | **Phase 10** — Offline sync with Supabase | ⬜ Not started | 0% |
 | **Phase 11** — Localization + polish + Play Store | ⬜ Not started | 0% |
 
-**5 of 10 phases complete (~50%)** — the whole core-tracking loop (animals → milk → health → finance → alerts) is live locally.
+**8 of 11 phases complete (~73%)** — reproduction lifecycle fully closed: heat → mating → pregnancy → calving → calf becomes an animal.
 
 ---
 
@@ -154,27 +154,53 @@ Kotlin 2.4 stdlib migration (`kotlin.time.Clock`), Room 2.6 API fixes.
 
 ---
 
-## Phase 6 — Add-forms wiring + alert scheduler triggers ⬜ (Next)
+## Phase 6 — Add-forms wiring + alert scheduler triggers ✅
 
-Planned:
-- Add Vaccination bottom sheet in Health screen (calls `AlertScheduler.scanNow()` after save)
-- Add Health Event bottom sheet with symptom multi-select
+**Completed:** 2026-08-02 (PR #9)
+
+- Add Vaccination bottom sheet on Health screen (calls `AlertScheduler.scanNow()` after save)
+- Add Health Event sheet with symptom multi-select
 - Add Vet Contact form
-- Verify overdue chip on Health screen updates from real data
-- Verify bell badge lights up after adding a due-soon vaccine
+- Overdue chip on Health screen driven by live data
+- Bell badge auto-refreshes on due-soon vaccinations
 
 ---
 
-## Phase 7 — Feeding + Breeding + Pregnancy ⬜
+## Phase 7 — Feeding Management ✅
 
-Planned (drawer destinations):
-- Feed log + inventory + low-stock alerts
-- Heat calendar + AI record + conception status
-- Pregnancy timeline + expected calving alerts
+**Completed:** 2026-08-02 (PR #10)
+
+- FeedType / FeedRecord / FeedInventory domain
+- Room v6 branch (feeding): 3 entities + DAOs + repository
+- Feeding screen with per-animal daily log, per-feed schedule, and inventory view
+- Low-stock alerts fire when kg-remaining < threshold
 
 ---
 
-## Phase 8 — Reports + PDF/CSV export ⬜
+## Phase 8 — Breeding + Pregnancy + Calving ✅
+
+**Completed:** 2026-08-02 (this PR)
+
+- Domain: `HeatRecord`, `BreedingRecord`, `PregnancyRecord` + 5 enums (HeatIntensity,
+  BreedingType AI/NATURAL, ConceptionStatus PENDING/CONFIRMED/FAILED, PdMethod, CalvingOutcome)
+- Room v6 (breeding branch): 3 entities, 3 DAOs (all non-suspend, KSP2-safe), FK CASCADE
+- `BreedingRepository` (18 methods) + Impl using `combine()` with `animalsMap` for
+  denormalized detail views. `recordCalving()` auto-creates calf Animal when requested.
+- `BreedingViewModel` — 4 form states (Heat / Mating / Pregnancy / Calving),
+  combines UI state via `combine(groupA, groupB)`, calls `alertScheduler.scanNow()`
+  on every mutation
+- `BreedingScreen` — green-gradient header + 3 summary chips (Pregnant / Calving Soon /
+  Awaiting PD), 4 tabs (Heat / Mating / Pregnancy / Calving), contextual FAB per tab
+- 4 bottom-sheet forms with animal picker, symptom chip multi-select, intensity toggle,
+  AI vs Natural swap, PD method radio, calving outcome + difficulty + auto-calf creation
+- `AlertScannerWorker` extended:
+  - `scanExpectedHeats()` — 21-day heat cycle prediction, alert 1 day before, dedup by `heat:{id}`
+  - `scanCalvingDue()` — 7-day window, URGENT ≤ 2 days, dedup by `calving:{id}`
+- Wired into `MainScaffold` for both `Screen.Breeding.route` and `Screen.Pregnancy.route`
+
+---
+
+## Phase 9 — Reports + PDF/CSV export ⬜
 
 Planned:
 - Milk production report (per-animal + herd)
@@ -184,7 +210,7 @@ Planned:
 
 ---
 
-## Phase 9 — Supabase cloud sync ⬜
+## Phase 10 — Supabase cloud sync ⬜
 
 Planned:
 - Supabase project + RLS policies
@@ -194,7 +220,7 @@ Planned:
 
 ---
 
-## Phase 10 — Localization + polish + Play Store ⬜
+## Phase 11 — Localization + polish + Play Store ⬜
 
 Planned:
 - Hindi + Odia strings
@@ -208,13 +234,13 @@ Planned:
 
 | Metric | Count |
 |---|---|
-| Total Kotlin files | ~80 |
-| Total lines of code | ~10,000 |
-| Screens built (functional) | 15+ of 32 (~47%) |
-| Modules complete | 5 of 10 (50%) |
-| Room DB version | 5 |
-| Git commits on main | 40+ |
-| Merged PRs | 7 |
+| Total Kotlin files | ~95 |
+| Total lines of code | ~13,000 |
+| Screens built (functional) | 20+ of 32 (~63%) |
+| Modules complete | 8 of 11 (~73%) |
+| Room DB version | 6 |
+| Git commits on main | 45+ |
+| Merged PRs | 10 |
 
 ---
 

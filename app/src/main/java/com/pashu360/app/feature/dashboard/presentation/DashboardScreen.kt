@@ -15,6 +15,9 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,11 +39,17 @@ import com.pashu360.app.core.presentation.theme.PashuGreenLight
 
 @Composable
 fun DashboardScreen(
+    viewModel: DashboardViewModel = hiltViewModel(),
     alertCount: Int = 2,   // TODO: wire to Alerts repository in PR #6
     onMenuClick: () -> Unit = {},
     onBellClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onLogMilkClick: () -> Unit = {},
+    onAddVaccineClick: () -> Unit = {},
+    onAddAnimalClick: () -> Unit = {},
+    onFeedClick: () -> Unit = {}
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -76,16 +85,18 @@ fun DashboardScreen(
                     Spacer(Modifier.height(4.dp))
 
                     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                        Text("🌅 Good Morning",
+                        Text("${state.greetingEmoji} ${state.greetingByTime}",
                             fontSize = 13.sp,
                             color = Color.White.copy(alpha = 0.85f),
                             fontWeight = FontWeight.Medium)
-                        Text("Ramesh",
+                        Text(
+                            state.ownerName.takeIf { it.isNotBlank() }?.split(' ')?.first() ?: "Farmer",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White)
                         Spacer(Modifier.height(4.dp))
-                        Text("Sharma Dairy Farm • Wed, 1 Aug",
+                        val farmLabel = state.farmName.takeIf { it.isNotBlank() } ?: "Your Farm"
+                        Text("$farmLabel • ${state.todayFormatted}",
                             fontSize = 12.sp,
                             color = Color.White.copy(alpha = 0.8f))
 
@@ -153,9 +164,13 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                MiniStat("0", "Cows", Icons.Filled.Pets, PashuGreen, Modifier.weight(1f))
-                MiniStat("0", "Vaccines", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
-                MiniStat("0", "Sick", Icons.Filled.Favorite, ColorSick, Modifier.weight(1f))
+                val cowsLabel = if (state.expectedHerdSize > 0)
+                    "${state.cowCount} / ${state.expectedHerdSize}"
+                else
+                    "${state.cowCount}"
+                MiniStat(cowsLabel, "Cows", Icons.Filled.Pets, PashuGreen, Modifier.weight(1f))
+                MiniStat("${state.vaccinesDueCount}", "Vaccines", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
+                MiniStat("${state.sickCount}", "Sick", Icons.Filled.Favorite, ColorSick, Modifier.weight(1f))
             }
 
             // ── QUICK ACTIONS ────────────────────
@@ -165,13 +180,17 @@ fun DashboardScreen(
                     color = MaterialTheme.colorScheme.onSurface)
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    QuickAction("Log Milk", Icons.Filled.LocalDrink, PashuGreen, Modifier.weight(1f))
-                    QuickAction("Vaccine", Icons.Filled.Vaccines, PashuAmber, Modifier.weight(1f))
+                    QuickAction("Log Milk", Icons.Filled.LocalDrink, PashuGreen,
+                        onClick = onLogMilkClick, modifier = Modifier.weight(1f))
+                    QuickAction("Vaccine", Icons.Filled.Vaccines, PashuAmber,
+                        onClick = onAddVaccineClick, modifier = Modifier.weight(1f))
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    QuickAction("Add Cow", Icons.Filled.Add, MaterialTheme.colorScheme.tertiary, Modifier.weight(1f))
-                    QuickAction("Feed", Icons.Filled.Grass, Color(0xFF7B9E4A), Modifier.weight(1f))
+                    QuickAction("Add Cow", Icons.Filled.Add, MaterialTheme.colorScheme.tertiary,
+                        onClick = onAddAnimalClick, modifier = Modifier.weight(1f))
+                    QuickAction("Feed", Icons.Filled.Grass, Color(0xFF7B9E4A),
+                        onClick = onFeedClick, modifier = Modifier.weight(1f))
                 }
             }
 
@@ -260,9 +279,11 @@ private fun QuickAction(
     label: String,
     icon: ImageVector,
     color: Color,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),

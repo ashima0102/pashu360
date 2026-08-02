@@ -36,7 +36,7 @@ import com.pashu360.app.core.presentation.theme.PashuGreenLight
 
 @Composable
 fun RegisterScreen(
-    onRegistered: () -> Unit,
+    onRegistered: (fullName: String) -> Unit,
     onBack: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
@@ -205,7 +205,7 @@ fun RegisterScreen(
                     Spacer(Modifier.height(28.dp))
 
                     Button(
-                        onClick = onRegistered,
+                        onClick = { onRegistered(name.trim()) },
                         enabled = isValid,
                         modifier = Modifier.fillMaxWidth().height(60.dp),
                         shape = RoundedCornerShape(16.dp),
@@ -269,6 +269,6 @@ private fun LabeledField(label: String, content: @Composable () -> Unit) {
 @Composable
 private fun RegisterScreenPreview() {
     Pashu360Theme(dynamicColor = false) {
-        RegisterScreen(onRegistered = {}, onBack = {})
+        RegisterScreen(onRegistered = { _ -> }, onBack = {})
     }
 }

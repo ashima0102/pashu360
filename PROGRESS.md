@@ -179,24 +179,36 @@ Kotlin 2.4 stdlib migration (`kotlin.time.Clock`), Room 2.6 API fixes.
 
 ## Phase 8 — Breeding + Pregnancy + Calving ✅
 
-**Completed:** 2026-08-02 (this PR)
+**Completed & merged:** 2026-08-02 (PR #11)
 
-- Domain: `HeatRecord`, `BreedingRecord`, `PregnancyRecord` + 5 enums (HeatIntensity,
+### Reproduction lifecycle domain
+- `HeatRecord`, `BreedingRecord`, `PregnancyRecord` + 5 enums (HeatIntensity,
   BreedingType AI/NATURAL, ConceptionStatus PENDING/CONFIRMED/FAILED, PdMethod, CalvingOutcome)
-- Room v6 (breeding branch): 3 entities, 3 DAOs (all non-suspend, KSP2-safe), FK CASCADE
+- 3 Room entities + 3 DAOs (non-suspend, KSP2-safe), FK CASCADE to animals
 - `BreedingRepository` (18 methods) + Impl using `combine()` with `animalsMap` for
   denormalized detail views. `recordCalving()` auto-creates calf Animal when requested.
-- `BreedingViewModel` — 4 form states (Heat / Mating / Pregnancy / Calving),
-  combines UI state via `combine(groupA, groupB)`, calls `alertScheduler.scanNow()`
-  on every mutation
-- `BreedingScreen` — green-gradient header + 3 summary chips (Pregnant / Calving Soon /
-  Awaiting PD), 4 tabs (Heat / Mating / Pregnancy / Calving), contextual FAB per tab
-- 4 bottom-sheet forms with animal picker, symptom chip multi-select, intensity toggle,
-  AI vs Natural swap, PD method radio, calving outcome + difficulty + auto-calf creation
-- `AlertScannerWorker` extended:
-  - `scanExpectedHeats()` — 21-day heat cycle prediction, alert 1 day before, dedup by `heat:{id}`
-  - `scanCalvingDue()` — 7-day window, URGENT ≤ 2 days, dedup by `calving:{id}`
-- Wired into `MainScaffold` for both `Screen.Breeding.route` and `Screen.Pregnancy.route`
+- `BreedingViewModel` with 4 form states (Heat / Mating / Pregnancy / Calving)
+- `BreedingScreen` — green-gradient header + 3 summary chips + 4 tabs + contextual FAB
+- 4 bottom-sheet forms with animal picker, symptom multi-select, AI/Natural toggle,
+  PD-method radio, calving outcome + difficulty + auto-calf creation
+- `AlertScannerWorker` extended: `scanExpectedHeats()` (21-day cycle, 1 day early)
+  + `scanCalvingDue()` (7-day window, URGENT ≤ 2 days)
+
+### Farm persistence
+- `Farm` domain + Room `FarmEntity` / `FarmDao` / `FarmRepository`
+- `FarmSetupViewModel` persists Owner Name + Farm Name + Village + State + Expected herd
+- `RegisterViewModel.stashOwnerName()` handoff so Register's Full Name pre-fills
+  the setup wizard's Owner Name field
+
+### Dashboard live wiring
+- `DashboardViewModel` combines animal count, vaccines overdue+due-soon (7-day window),
+  active health issues, Farm data, and today's date/time-based greeting
+- Home header shows real farm name, first name (fallback "Farmer"), and formatted
+  today's date (e.g. "Sat, 2 Aug"). Greeting picks morning/afternoon/evening/night from clock
+- Cows mini-stat shows `X / Y expected` when farmer specified an expected herd size
+- Drawer header binds to the same live data
+- Dashboard quick-action cards (Log Milk / Vaccine / Add Cow / Feed) now navigate
+  to their destinations (previously non-clickable decorative cards)
 
 ---
 
@@ -234,13 +246,12 @@ Planned:
 
 | Metric | Count |
 |---|---|
-| Total Kotlin files | ~95 |
-| Total lines of code | ~13,000 |
-| Screens built (functional) | 20+ of 32 (~63%) |
+| Total Kotlin files | ~100+ |
+| Total lines of code | ~15,000 |
+| Screens built (functional) | 22+ of 32 (~69%) |
 | Modules complete | 8 of 11 (~73%) |
-| Room DB version | 6 |
-| Git commits on main | 45+ |
-| Merged PRs | 10 |
+| Room DB version | 8 |
+| Merged PRs | 11 |
 
 ---
 
@@ -248,4 +259,4 @@ Planned:
 
 - **GitHub:** https://github.com/ashima0102/pashu360
 - **Default branch:** `main` (branch-protected, PR-only)
-- **Latest commit:** `d59adca` — Merge PR #7 (all remaining phases)
+- **Latest commit:** `88fd34b` — Phase 8: Breeding, Pregnancy & Calving (PR #11)

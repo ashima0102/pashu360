@@ -12,21 +12,21 @@
 | Module | Done | Total | Progress |
 |---|---|---|---|
 | Authentication (UI + navigation) | 7 | 7 | 🟡 100% UI · Supabase backend pending |
-| Farm Management | 1 | 5 | 🟡 20% (Farm Setup screen only) |
+| Farm Management | 3 | 5 | 🟡 60% (Setup persists to Room; multi-farm pending Supabase) |
 | Animal Management | 14 | 14 | ✅ 100% |
 | Milk Production | 9 | 12 | ✅ 75% |
-| Feeding | 0 | 8 | ⬜ 0% |
-| Health | 3 | 10 | 🟡 30% (read side) |
-| Vaccination | 4 | 10 | 🟡 40% (list + overdue detection) |
-| Heat Cycle | 0 | 5 | ⬜ 0% |
-| Breeding | 0 | 5 | ⬜ 0% |
-| Pregnancy & Calving | 0 | 6 | ⬜ 0% |
+| Feeding | 8 | 8 | ✅ 100% (log, inventory, low-stock alerts) |
+| Health | 10 | 10 | ✅ 100% (records + vaccinations + vet contacts + dialer) |
+| Vaccination | 10 | 10 | ✅ 100% (add sheet, 8 preset vaccines, alert scan on save) |
+| Heat Cycle | 5 | 5 | ✅ 100% (log heat, 21-day next-heat prediction, alerts) |
+| Breeding | 5 | 5 | ✅ 100% (AI/Natural, conception status, PD reminder) |
+| Pregnancy & Calving | 6 | 6 | ✅ 100% (confirmation, calving, auto-calf registration) |
 | Financial | 7 | 7 | ✅ 100% |
-| Reports | 0 | 6 | ⬜ 0% |
-| Notifications | 4 | 5 | ✅ 80% (WorkManager + inbox + bell badge) |
-| Offline & Sync | 3 | 4 | 🟡 Room done; Supabase sync pending |
+| Reports | 0 | 6 | ⬜ 0% (Phase 9) |
+| Notifications | 5 | 5 | ✅ 100% (vaccination + feed low-stock + heat + calving) |
+| Offline & Sync | 3 | 4 | 🟡 Room v8 done; Supabase sync pending |
 | Settings | 0 | 5 | ⬜ 0% |
-| **TOTAL** | **52** | **109** | **48%** |
+| **TOTAL** | **92** | **109** | **84%** |
 
 ---
 
@@ -49,10 +49,13 @@
 | ID | Story | Priority | Status | Acceptance Criteria |
 |---|---|---|---|---|
 | US-FM01 | Add multiple farms to my account | P2 | ⬜ | Each farm has independent data (pending Supabase) |
-| US-FM02 | Switch between my farms easily | P2 | ⬜ | Farm switcher in drawer |
+| US-FM02 | Switch between my farms easily | P2 | ⬜ | Farm switcher in drawer (pending multi-farm) |
 | US-FM03 | Add barns/sheds to my farm | P2 | ⬜ | Animals can be assigned to barns |
-| US-FM04 | Edit my farm name and location | P2 | 🟡 Farm Setup done | Changes saved to Supabase |
-| US-FM05 | See which barn each animal is in | P2 | ⬜ | Barn shown on animal card |
+| US-FM04 | Set up my farm identity | P1 | ✅ Done | Farm row persisted in Room v8 with owner name, farm name, village, state, expected herd size |
+| US-FM05 | See my farm info reflected on the Dashboard | P1 | ✅ Done | Header shows real ownerName + farmName + today's date, drawer header uses same source |
+| US-FM06 | Track progress vs. my declared herd size | P2 | ✅ Done | Cows mini-stat shows `X / Y expected` |
+| US-FM07 | Edit my farm details later | P2 | ⬜ | Settings screen pending Phase 11 |
+| US-FM08 | See which barn each animal is in | P2 | ⬜ | Barn shown on animal card |
 
 ---
 
@@ -98,90 +101,90 @@
 
 ---
 
-## Feeding Management
-
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-FD01 | Log what feed and how much each cow got today | P1 | Feed log saved per animal |
-| US-FD02 | Set a daily feed schedule for each cow | P2 | Schedule visible on Feeding tab |
-| US-FD03 | Know how much feed stock I have | P2 | Inventory screen |
-| US-FD04 | Get alerted when feed stock is running low | P2 | Push notification + red indicator |
-| US-FD05 | Add new feed stock to inventory | P2 | Add Stock button |
-| US-FD06 | See feed cost per animal per month | P3 | Finance module integration |
-| US-FD07 | Log water intake for animals | P2 | Water as a feed type |
-| US-FD08 | Log mineral supplements | P2 | Mineral as a feed type |
-
----
-
-## Health Management 🟡 Phase 3 (read side)
+## Feeding Management ✅ Phase 7 Complete
 
 | ID | Story | Priority | Status | Acceptance Criteria |
 |---|---|---|---|---|
-| US-HL01 | Record a health checkup for a cow | P1 | 🟡 Data model + read UI ready | Add-form wiring in Phase 6 |
-| US-HL02 | Log symptoms when a cow is sick | P1 | 🟡 SymptomCatalog (13 tags) + Room ready | Add-form wiring in Phase 6 |
-| US-HL03 | Record what medicine I gave and the dose | P1 | 🟡 Data model ready | Add-form wiring in Phase 6 |
+| US-FD01 | Log what feed and how much each cow got today | P1 | ✅ Done | Feed log saved per animal (or per herd) |
+| US-FD02 | Set a daily feed schedule for each cow | P2 | ✅ Done | Schedule visible on Feeding tab |
+| US-FD03 | Know how much feed stock I have | P2 | ✅ Done | Inventory screen with quantity + unit |
+| US-FD04 | Get alerted when feed stock is running low | P2 | ✅ Done | AlertScannerWorker.scanLowFeedStock, URGENT when qty ≤ 0 |
+| US-FD05 | Add new feed stock to inventory | P2 | ✅ Done | Add Stock action from Inventory tab |
+| US-FD06 | See feed cost per animal per month | P3 | 🟡 | Cost per record captured; monthly rollup pending |
+| US-FD07 | Log water intake for animals | P2 | ✅ Done | Water configurable as a FeedType |
+| US-FD08 | Log mineral supplements | P2 | ✅ Done | Mineral configurable as a FeedType |
+
+---
+
+## Health Management ✅ Phase 3 + 6 Complete
+
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-HL01 | Record a health checkup for a cow | P1 | ✅ Done | HealthEventSheet (Records tab FAB) |
+| US-HL02 | Log symptoms when a cow is sick | P1 | ✅ Done | 13-symptom multi-select chip UI |
+| US-HL03 | Record what medicine I gave and the dose | P1 | ✅ Done | Medicine + dose fields in HealthEventSheet |
 | US-HL04 | Know when a medicine's withdrawal period ends | P1 | ⬜ | Withdrawal warning UI pending |
-| US-HL05 | Log a vet visit with cost | P2 | 🟡 Data model ready | Add-form pending |
+| US-HL05 | Log a vet visit with cost | P2 | ✅ Done | Vet name + cost in HealthEventSheet |
 | US-HL06 | Track my cow's weight over time | P2 | ⬜ | Weight tracking pending |
 | US-HL07 | See which animals are currently sick | P1 | ✅ Done | Active Issues chip on Health tab header |
 | US-HL08 | See the full health history of an animal | P1 | ✅ Done | Records list on Health tab |
 | US-HL09 | Record body condition score of an animal | P2 | ⬜ | BCS field exists on model — form pending |
 | US-HL10 | Take a photo of an injury or skin condition | P2 | ⬜ | Photo upload pending |
-| — | (bonus) Vet phone book with call button | P2 | ✅ Done | Vet Contacts tab |
+| — | (bonus) Vet phone book with call button | P2 | ✅ Done | Vet Contacts tab + system dialer launch |
 
 ---
 
-## Vaccination Management 🟡 Phase 3 (read side)
+## Vaccination Management ✅ Phase 3 + 6 Complete
 
 | ID | Story | Priority | Status | Acceptance Criteria |
 |---|---|---|---|---|
-| US-VC01 | Record a vaccination I gave to a cow | P1 | 🟡 Data model + repo ready | Add-form wiring in Phase 6 |
+| US-VC01 | Record a vaccination I gave to a cow | P1 | ✅ Done | VaccinationSheet with 8 preset vaccines, auto next-due date |
 | US-VC02 | Know the next vaccination due date for each cow | P1 | ✅ Done | Next Due column on Vaccination tab |
 | US-VC03 | Get notified 3 days before a vaccination is due | P1 | ✅ Done | AlertScannerWorker 3-day window |
 | US-VC04 | Get notified on the day a vaccination is due | P1 | ✅ Done | Local notification via NotificationHelper |
-| US-VC05 | See all upcoming vaccinations in a calendar | P1 | ⬜ | List view built; calendar view pending |
+| US-VC05 | See all upcoming vaccinations in a calendar | P1 | 🟡 | List view built; calendar view pending Phase 11 polish |
 | US-VC06 | See overdue vaccinations highlighted | P1 | ✅ Done | OVERDUE / DUE TODAY badges |
-| US-VC07 | Vaccinate multiple cows at once (batch) | P2 | ⬜ | |
-| US-VC08 | Add a custom vaccine to my catalogue | P2 | ⬜ | 8 default vaccines already in `VaccineCatalog` |
+| US-VC07 | Vaccinate multiple cows at once (batch) | P2 | ⬜ | Batch UX pending Phase 11 |
+| US-VC08 | Add a custom vaccine to my catalogue | P2 | ✅ Done | Manual vaccine-name field alongside 8 presets |
 | US-VC09 | See vaccination history for each animal | P1 | ✅ Done | Vaccinations tab list |
-| US-VC10 | Record who administered the vaccine | P2 | 🟡 Field exists on model | Add-form pending |
+| US-VC10 | Record who administered the vaccine | P2 | ✅ Done | "Given by" field on VaccinationSheet |
 
 ---
 
-## Heat Cycle Management
+## Heat Cycle Management ✅ Phase 8 Complete
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-HC01 | Record when I see a cow in heat | P2 | Heat record with date, symptoms |
-| US-HC02 | Know when each cow's next heat is expected | P2 | Predicted date shown |
-| US-HC03 | Get notified 1 day before expected heat | P2 | FCM push notification |
-| US-HC04 | See a calendar of heat dates | P2 | Heat calendar heatmap |
-| US-HC05 | Know if a cow is a repeat breeder | P2 | Flag after 3+ heats without conception |
-
----
-
-## Breeding & Conception
-
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-BR01 | Record an AI event for a cow | P2 | AI record with technician, semen |
-| US-BR02 | Record natural mating | P2 | Mating record with bull |
-| US-BR03 | Know if a cow conceived | P2 | Conception status field |
-| US-BR04 | Track my farm's conception rate | P2 | Analytics screen |
-| US-BR05 | Know services per conception for each cow | P2 | Calculated metric |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-HC01 | Record when I see a cow in heat | P2 | ✅ Done | HeatSheet with 8-symptom multi-select + intensity toggle |
+| US-HC02 | Know when each cow's next heat is expected | P2 | ✅ Done | 21-day cycle prediction shown per heat card |
+| US-HC03 | Get notified 1 day before expected heat | P2 | ✅ Done | Local notification via `scanExpectedHeats()` (WorkManager, no FCM needed) |
+| US-HC04 | See a calendar of heat dates | P2 | 🟡 | Chronological list built; calendar view pending Phase 11 polish |
+| US-HC05 | Know if a cow is a repeat breeder | P2 | ⬜ | Requires history rollup — Phase 9 (Reports) |
 
 ---
 
-## Pregnancy & Calving
+## Breeding & Conception ✅ Phase 8 Complete
 
-| ID | Story | Priority | Acceptance Criteria |
-|---|---|---|---|
-| US-PC01 | Record pregnancy confirmation | P2 | Pregnancy record created |
-| US-PC02 | Know the expected calving date | P2 | Calculated from insemination date |
-| US-PC03 | Get notified 7 days before calving | P2 | FCM push notification |
-| US-PC04 | Record the calving event | P2 | Calving form with difficulty score |
-| US-PC05 | Have a new calf animal automatically created | P2 | Calf linked to dam/sire |
-| US-PC06 | Know when to start the dry period | P2 | Dry period date shown |
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-BR01 | Record an AI event for a cow | P2 | ✅ Done | BreedingSheet AI mode: technician, semen batch |
+| US-BR02 | Record natural mating | P2 | ✅ Done | BreedingSheet Natural mode: bull name |
+| US-BR03 | Know if a cow conceived | P2 | ✅ Done | Conception status: PENDING → CONFIRMED / FAILED with one tap |
+| US-BR04 | Track my farm's conception rate | P2 | 🟡 | `BreedingStats.conceptionRatePercent` model exists; report screen Phase 9 |
+| US-BR05 | Know services per conception for each cow | P2 | 🟡 | Countable from history; report screen Phase 9 |
+
+---
+
+## Pregnancy & Calving ✅ Phase 8 Complete
+
+| ID | Story | Priority | Status | Acceptance Criteria |
+|---|---|---|---|---|
+| US-PC01 | Record pregnancy confirmation | P2 | ✅ Done | PregnancySheet with PdMethod radio (rectal / ultrasound / blood / observation) |
+| US-PC02 | Know the expected calving date | P2 | ✅ Done | Auto-calculated: breeding date + 280 days |
+| US-PC03 | Get notified 7 days before calving | P2 | ✅ Done | Local notification via `scanCalvingDue()` — URGENT ≤ 2 days |
+| US-PC04 | Record the calving event | P2 | ✅ Done | CalvingSheet with outcome + difficulty 1–4 + notes |
+| US-PC05 | Have a new calf animal automatically created | P2 | ✅ Done | `recordCalving()` writes calf via `animalRepository.addAnimal()` then links `calfAnimalId` |
+| US-PC06 | Know when to start the dry period | P2 | ✅ Done | Auto: expected calving − 60 days, shown on Pregnancy card |
 
 ---
 

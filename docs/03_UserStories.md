@@ -69,10 +69,11 @@
 | US-AM04 | Search for an animal by name or tag number | P1 | ✅ Done | Live filter on animal list |
 | US-AM05 | Filter my herd by status (sick, pregnant, etc.) | P1 | ✅ Done | Filter chips: All/Active/Pregnant/Sick/Dry/Sold |
 | US-AM06 | See a complete history of each animal's life | P1 | 🟡 UI + tabs built | Timeline data comes with Phase 2+ |
-| US-AM07 | Mark an animal as sold with sale price | P2 | ⬜ | Edit screen not built yet |
-| US-AM08 | Mark an animal as deceased with reason | P2 | ⬜ | Edit screen not built yet |
+| US-AM07 | Mark an animal as sold with sale price | P2 | 🟡 Status change works; sale-price field pending | Tap status badge → pick Sold |
+| US-AM08 | Mark an animal as deceased with reason | P2 | 🟡 Status change works; reason field pending | Tap status badge → pick Deceased |
 | US-AM09 | Transfer an animal to another farm | P2 | ⬜ | Multi-farm support pending Supabase |
-| US-AM10 | Edit any animal's details | P1 | ⬜ | Edit screen not built yet (pencil icon shown) |
+| US-AM10 | Edit any animal's details | P1 | 🟡 Status editable; full edit screen pending | Change Status dialog exists; full edit screen Phase 11 |
+| — | (bonus) Set initial status when adding an animal | P1 | ✅ Done | AddAnimalScreen status picker (Active/Pregnant/Dry/Sick) |
 | US-AM11 | See each animal's today's milk on the list | P1 | 🟡 Placeholder | Data comes with Phase 2 (Milk) |
 | US-AM12 | Add an RFID tag number to an animal | P2 | ✅ Done | RFID field in Room + domain |
 | US-AM13 | Print the QR code for an animal's ear tag | P2 | ⬜ | Share sheet pending |

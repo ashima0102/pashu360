@@ -58,6 +58,9 @@ fun HealthScreen(
     onProfileClick: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val vaccinationForm by viewModel.vaccinationForm.collectAsStateWithLifecycle()
+    val healthEventForm by viewModel.healthEventForm.collectAsStateWithLifecycle()
+    val vetContactForm by viewModel.vetContactForm.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Records", "Vaccinations", "Vet Contacts")
@@ -156,8 +159,12 @@ fun HealthScreen(
 
         // ── FAB (contextual per-tab) ────────
         ExtendedFloatingActionButton(
-            onClick = { /* opens per-tab add form in the next iteration */
-                Toast.makeText(context, "Add form coming next", Toast.LENGTH_SHORT).show()
+            onClick = {
+                when (selectedTab) {
+                    0 -> viewModel.openHealthEventForm()
+                    1 -> viewModel.openVaccinationForm()
+                    2 -> viewModel.openVetContactForm()
+                }
             },
             containerColor = PashuGreen,
             contentColor = Color.White,
@@ -173,6 +180,45 @@ fun HealthScreen(
                 )
             },
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
+        )
+    }
+
+    // ── ADD SHEETS ─────────────────────────────────
+    if (vaccinationForm.show) {
+        AddVaccinationSheet(
+            state = vaccinationForm,
+            animals = state.animals,
+            onDismiss = viewModel::closeVaccinationForm,
+            onAnimalChange = viewModel::onVaccinationAnimalChanged,
+            onTemplateChange = viewModel::onVaccinationTemplateChanged,
+            onCustomNameChange = viewModel::onCustomVaccineNameChanged,
+            onAdministeredDateChange = viewModel::onVaccinationAdministeredDateChanged,
+            onNextDueDateChange = viewModel::onVaccinationNextDueDateChanged,
+            onFieldChange = viewModel::onVaccinationFieldChanged,
+            onSave = viewModel::saveVaccination
+        )
+    }
+
+    if (healthEventForm.show) {
+        AddHealthEventSheet(
+            state = healthEventForm,
+            animals = state.animals,
+            onDismiss = viewModel::closeHealthEventForm,
+            onAnimalChange = viewModel::onHealthAnimalChanged,
+            onEventTypeChange = viewModel::onEventTypeChanged,
+            onSeverityChange = viewModel::onSeverityChanged,
+            onSymptomToggle = viewModel::onSymptomToggled,
+            onFieldChange = viewModel::onHealthFieldChanged,
+            onSave = viewModel::saveHealthEvent
+        )
+    }
+
+    if (vetContactForm.show) {
+        AddVetContactSheet(
+            state = vetContactForm,
+            onDismiss = viewModel::closeVetContactForm,
+            onFieldChange = viewModel::onVetContactFieldChanged,
+            onSave = viewModel::saveVetContact
         )
     }
 }

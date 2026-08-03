@@ -12,7 +12,7 @@
 | Module | Done | Total | Progress |
 |---|---|---|---|
 | Authentication (UI + navigation) | 7 | 7 | 🟡 100% UI · Supabase backend pending |
-| Farm Management | 3 | 5 | 🟡 60% (Setup persists to Room; multi-farm pending Supabase) |
+| Farm Management | 6 | 7 | ✅ 86% (Setup + Edit; multi-farm pending Supabase) |
 | Animal Management | 15 | 15 | ✅ 100% (added US-AM15 — full per-animal history tabs) |
 | Milk Production | 9 | 12 | ✅ 75% |
 | Feeding | 8 | 8 | ✅ 100% (log, inventory, low-stock alerts) |
@@ -26,7 +26,7 @@
 | Notifications | 5 | 5 | ✅ 100% (vaccination + feed low-stock + heat + calving) |
 | Offline & Sync | 3 | 4 | 🟡 Room v8 done; Supabase sync pending |
 | Settings | 0 | 5 | ⬜ 0% |
-| **TOTAL** | **93** | **110** | **85%** |
+| **TOTAL** | **97** | **110** | **88%** |
 
 ---
 
@@ -54,7 +54,7 @@
 | US-FM04 | Set up my farm identity | P1 | ✅ Done | Farm row persisted in Room v8 with owner name, farm name, village, state, expected herd size |
 | US-FM05 | See my farm info reflected on the Dashboard | P1 | ✅ Done | Header shows real ownerName + farmName + today's date, drawer header uses same source |
 | US-FM06 | Track progress vs. my declared herd size | P2 | ✅ Done | Cows mini-stat shows `X / Y expected` |
-| US-FM07 | Edit my farm details later | P2 | ⬜ | Settings screen pending Phase 11 |
+| US-FM07 | Edit my farm details later | P2 | ✅ Done | Drawer → Farm Info opens a real editor backed by FarmInfoViewModel |
 | US-FM08 | See which barn each animal is in | P2 | ⬜ | Barn shown on animal card |
 
 ---
@@ -69,10 +69,10 @@
 | US-AM04 | Search for an animal by name or tag number | P1 | ✅ Done | Live filter on animal list |
 | US-AM05 | Filter my herd by status (sick, pregnant, etc.) | P1 | ✅ Done | Filter chips: All/Active/Pregnant/Sick/Dry/Sold |
 | US-AM06 | See a complete history of each animal's life | P1 | 🟡 UI + tabs built | Timeline data comes with Phase 2+ |
-| US-AM07 | Mark an animal as sold with sale price | P2 | 🟡 Status change works; sale-price field pending | Tap status badge → pick Sold |
-| US-AM08 | Mark an animal as deceased with reason | P2 | 🟡 Status change works; reason field pending | Tap status badge → pick Deceased |
+| US-AM07 | Mark an animal as sold with sale price | P2 | ✅ Done | Tap status badge → pick Sold → SoldCaptureDialog (date + price + buyer) |
+| US-AM08 | Mark an animal as deceased with reason | P2 | ✅ Done | Tap status badge → pick Deceased → DeceasedCaptureDialog (date + reason) |
 | US-AM09 | Transfer an animal to another farm | P2 | ⬜ | Multi-farm support pending Supabase |
-| US-AM10 | Edit any animal's details | P1 | 🟡 Status editable; full edit screen pending | Change Status dialog exists; full edit screen Phase 11 |
+| US-AM10 | Edit any animal's details | P1 | ✅ Done | EditAnimalScreen — pencil icon opens pre-filled form |
 | — | (bonus) Set initial status when adding an animal | P1 | ✅ Done | AddAnimalScreen status picker (Active/Pregnant/Dry/Sick) |
 | US-AM11 | See each animal's today's milk on the list | P1 | 🟡 Placeholder | Data comes with Phase 2 (Milk); Animal Detail Milk tab now shows full history |
 | US-AM12 | Add an RFID tag number to an animal | P2 | ✅ Done | RFID field in Room + domain |

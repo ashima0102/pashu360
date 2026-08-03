@@ -1,6 +1,7 @@
 package com.pashu360.app.core.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,11 +15,24 @@ import com.pashu360.app.feature.auth.presentation.OtpVerificationScreen
 import com.pashu360.app.feature.auth.presentation.RegisterScreen
 import com.pashu360.app.feature.auth.presentation.RegisterViewModel
 import com.pashu360.app.feature.auth.presentation.SplashScreen
+import com.pashu360.app.DeepLink
 
 @Composable
 fun Pashu360NavHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    pendingDeepLink: DeepLink? = null,
+    onDeepLinkConsumed: () -> Unit = {}
 ) {
+    // When a notification-tap wakes the app with pashu360://animal/{id},
+    // jump past Splash to Dashboard immediately; MainScaffold's nested
+    // NavHost consumes the DeepLink and navigates to AnimalDetail.
+    LaunchedEffect(pendingDeepLink) {
+        if (pendingDeepLink is DeepLink.Animal) {
+            navController.navigate(Screen.Dashboard.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route
@@ -98,7 +112,11 @@ fun Pashu360NavHost(
 
         // ── MAIN APP (bottom nav) ────────────────────────
         composable(Screen.Dashboard.route) {
-            MainScaffold(rootNavController = navController)
+            MainScaffold(
+                rootNavController = navController,
+                pendingDeepLink = pendingDeepLink,
+                onDeepLinkConsumed = onDeepLinkConsumed
+            )
         }
     }
 }

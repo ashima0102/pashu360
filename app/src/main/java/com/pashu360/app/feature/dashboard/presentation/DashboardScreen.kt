@@ -141,7 +141,7 @@ fun DashboardScreen(
                                         fontWeight = FontWeight.Medium)
                                 }
                                 Button(
-                                    onClick = { },
+                                    onClick = onLogMilkClick,
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = PashuGreen),
                                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)

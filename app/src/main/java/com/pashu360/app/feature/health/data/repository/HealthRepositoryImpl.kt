@@ -78,7 +78,17 @@ class HealthRepositoryImpl @Inject constructor(
 
     override suspend fun saveVaccination(vaccination: Vaccination): Result<Unit> =
         withContext(Dispatchers.IO) {
-            runCatching { vaccinationDao.insert(VaccinationEntity.fromDomain(vaccination)) }.map { }
+            runCatching {
+                // Reject nextDueDate <= administeredDate — the alert scanner
+                // would otherwise fire immediately for a shot just given.
+                vaccination.nextDueDate?.let { next ->
+                    require(next > vaccination.administeredDate) {
+                        "Next due date must be after administered date"
+                    }
+                }
+                require(vaccination.vaccineName.isNotBlank()) { "Vaccine name is required" }
+                vaccinationDao.insert(VaccinationEntity.fromDomain(vaccination))
+            }.map { }
         }
 
     override suspend fun deleteVaccination(id: String): Result<Unit> =

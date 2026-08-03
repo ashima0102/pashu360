@@ -14,6 +14,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.5] — 2026-08-03 · P1+P2+P3 gap bundle ✅
+
+### Added
+- **MainActivity deep-link handler** parses `pashu360://animal/{id}` intents
+  from notification taps and threads them through Pashu360NavHost →
+  MainScaffold's nested NavHost, which navigates to AnimalDetail
+- **EditAnimalScreen + EditAnimalViewModel** — the pencil icon on
+  AnimalDetail now opens a pre-filled form (reuses the AddAnimalScreen
+  UI via the new `AnimalFormPublic` + `AnimalFormHandlers` contract)
+- **FarmInfoScreen + FarmInfoViewModel** — real editor for owner name,
+  farm name, village, state, expected herd size. Replaces the drawer's
+  ComingSoonScreen. Dashboard header + drawer header auto-refresh.
+- **Sold and Deceased capture dialogs** on AnimalDetail — picking Sold
+  captures sale date + price + buyer; picking Deceased captures date +
+  reason. Both write via `updateAnimal` so the previously-empty columns
+  are populated.
+
+### Fixed
+- Dashboard "Log" button next to Today's Milk KPI was `onClick = { }` —
+  now navigates to Milk tab
+- HealthScreen vet-contact Call icon was a TODO — now launches system
+  dialer via `Intent.ACTION_DIAL`
+- LoginScreen "Sign In" and "Forgot password?" now show an honest
+  demo-mode toast instead of silently pretending to authenticate
+- QR icon on AnimalDetail was a TODO — now navigates to QrScanner
+- Vaccination save rejects `nextDueDate <= administeredDate` (was
+  corrupting the alert scanner's due-window logic)
+- `BreedingRepository.recordCalving` rejects if the pregnancy already
+  has `actualCalvingDate` set — blocks accidental double-calving
+
+Merged via PR #19
+
+---
+
 ## [0.9.4] — 2026-08-03 · Animal profile now shows full per-animal history ✅
 
 The Milk / Vaccination / Health / Feeding / Breeding tabs on the animal

@@ -251,7 +251,7 @@ Planned:
 | Screens built (functional) | 23 of 32 (~72%) |
 | Modules complete | 8 of 11 (~73%) |
 | Room DB version | 8 |
-| Merged PRs | 17 |
+| Merged PRs | 19 |
 
 ---
 
@@ -286,10 +286,21 @@ Planned:
 - Breeding tab groups records into Pregnancies (ACTIVE badge) / Matings
   (conception-status color) / Heat events (intensity color)
 
+**PR #18** — docs sync after PR #16/#17
+
+**PR #19** — P1+P2+P3 gap bundle
+- Deep-link handler in MainActivity (`pashu360://animal/{id}` opens on tap)
+- Edit Animal screen (pencil on AnimalDetail); QR icon → scanner
+- Farm Info drawer destination is now a real editor (was ComingSoon)
+- Sold / Deceased capture dialogs — capture date, price, buyer, reason
+- LoginScreen honesty toasts; Dashboard Log button + vet dialer fixed
+- Vaccination `next-due > administered` validation
+- Blocks double-calving on the same pregnancy row
+
 ---
 
 ## Repository
 
 - **GitHub:** https://github.com/ashima0102/pashu360
 - **Default branch:** `main` (branch-protected, PR-only)
-- **Latest merged PR:** #17 — Animal Detail Feeding + Breeding tabs
+- **Latest merged PR:** #19 — P1+P2+P3 gap bundle

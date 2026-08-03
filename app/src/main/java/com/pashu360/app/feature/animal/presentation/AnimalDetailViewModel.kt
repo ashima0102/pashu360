@@ -14,6 +14,8 @@ import com.pashu360.app.core.domain.model.Vaccination
 import com.pashu360.app.core.domain.model.VaccineTemplate
 import com.pashu360.app.feature.animal.domain.repository.AnimalRepository
 import com.pashu360.app.feature.animal.domain.usecase.GetAnimalByIdUseCase
+import com.pashu360.app.feature.breeding.domain.repository.BreedingRepository
+import com.pashu360.app.feature.feeding.domain.repository.FeedingRepository
 import com.pashu360.app.feature.health.domain.repository.HealthRepository
 import com.pashu360.app.feature.milk.domain.repository.BulkEntryInput
 import com.pashu360.app.feature.milk.domain.repository.MilkRepository
@@ -94,6 +96,8 @@ class AnimalDetailViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
     private val milkRepository: MilkRepository,
     private val healthRepository: HealthRepository,
+    private val feedingRepository: FeedingRepository,
+    private val breedingRepository: BreedingRepository,
     private val alertScheduler: AlertScheduler,
     private val sessionStore: SessionStore,
     savedStateHandle: SavedStateHandle
@@ -121,6 +125,26 @@ class AnimalDetailViewModel @Inject constructor(
 
     val milkHistory: StateFlow<List<com.pashu360.app.core.domain.model.MilkRecord>> =
         milkRepository.observeRecordsForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
+    val feedHistory: StateFlow<List<com.pashu360.app.core.domain.model.FeedRecordWithType>> =
+        feedingRepository.observeRecordsForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
+    val heatHistory: StateFlow<List<com.pashu360.app.core.domain.model.HeatRecord>> =
+        breedingRepository.observeHeatForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
+    val breedingHistoryForAnimal: StateFlow<List<com.pashu360.app.core.domain.model.BreedingRecord>> =
+        breedingRepository.observeBreedingsForAnimal(animalId).stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
+        )
+
+    val pregnancyHistoryForAnimal: StateFlow<List<com.pashu360.app.core.domain.model.PregnancyRecord>> =
+        breedingRepository.observePregnanciesForAnimal(animalId).stateIn(
             viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList()
         )
 

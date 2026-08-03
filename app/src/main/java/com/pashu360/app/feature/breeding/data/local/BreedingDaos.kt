@@ -118,6 +118,13 @@ interface PregnancyRecordDao {
     @Query("SELECT * FROM pregnancy_records WHERE animal_id = :animalId AND actual_calving_date IS NULL LIMIT 1")
     fun getActiveForAnimal(animalId: String): PregnancyRecordEntity?
 
+    @Query("""
+        SELECT * FROM pregnancy_records
+        WHERE animal_id = :animalId
+        ORDER BY confirmation_date DESC
+    """)
+    fun observeForAnimal(animalId: String): Flow<List<PregnancyRecordEntity>>
+
     @Query("SELECT * FROM pregnancy_records WHERE id = :id LIMIT 1")
     fun getById(id: String): PregnancyRecordEntity?
 

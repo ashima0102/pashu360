@@ -70,6 +70,10 @@ fun AnimalDetailScreen(
     val vaccinationHistory by viewModel.vaccinationHistory.collectAsStateWithLifecycle()
     val healthHistory by viewModel.healthHistory.collectAsStateWithLifecycle()
     val milkHistory by viewModel.milkHistory.collectAsStateWithLifecycle()
+    val feedHistory by viewModel.feedHistory.collectAsStateWithLifecycle()
+    val heatHistory by viewModel.heatHistory.collectAsStateWithLifecycle()
+    val breedingHistoryForAnimal by viewModel.breedingHistoryForAnimal.collectAsStateWithLifecycle()
+    val pregnancyHistoryForAnimal by viewModel.pregnancyHistoryForAnimal.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val today = remember {
         @OptIn(ExperimentalTime::class)
@@ -261,10 +265,12 @@ fun AnimalDetailScreen(
                         records = healthHistory,
                         onAddClick = viewModel::openHealthSheet
                     )
-                    4 -> TabPlaceholder("Feeding", "Feeding schedule and logs",
-                        Icons.Filled.Grass)
-                    5 -> TabPlaceholder("Breeding", "Heat cycles, AI records, and pregnancy",
-                        Icons.Filled.Pets)
+                    4 -> FeedingHistoryTab(records = feedHistory)
+                    5 -> BreedingHistoryTab(
+                        heats = heatHistory,
+                        breedings = breedingHistoryForAnimal,
+                        pregnancies = pregnancyHistoryForAnimal
+                    )
                 }
                 Spacer(Modifier.height(32.dp))
             }
@@ -1319,5 +1325,150 @@ private fun AnimalEmptyPane(
         ) {
             Text(actionLabel, color = Color.White, fontWeight = FontWeight.SemiBold)
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────
+// FEEDING + BREEDING PER-ANIMAL TABS
+// ─────────────────────────────────────────────────────────
+
+@Composable
+private fun FeedingHistoryTab(
+    records: List<com.pashu360.app.core.domain.model.FeedRecordWithType>
+) {
+    if (records.isEmpty()) {
+        AnimalReadonlyEmptyPane(
+            emoji = "🌾",
+            title = "No feed records for this animal",
+            subtitle = "Open the Feeding tab from the drawer to log daily feed. Records linked to this animal will appear here."
+        )
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Feed Records (${records.size})",
+            fontSize = 12.sp, fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        records.forEach { r ->
+            HistoryRow(
+                emoji = r.feedTypeCategory.emoji,
+                title = "%.1f ${r.feedTypeUnit} · ${r.feedTypeName}".format(r.record.quantity),
+                subtitle = "${r.record.timeOfDay.displayName} • ${r.record.recordDate}",
+                extra = r.estimatedCost?.let { "₹ %.0f".format(it) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun BreedingHistoryTab(
+    heats: List<com.pashu360.app.core.domain.model.HeatRecord>,
+    breedings: List<com.pashu360.app.core.domain.model.BreedingRecord>,
+    pregnancies: List<com.pashu360.app.core.domain.model.PregnancyRecord>
+) {
+    val allEmpty = heats.isEmpty() && breedings.isEmpty() && pregnancies.isEmpty()
+    if (allEmpty) {
+        AnimalReadonlyEmptyPane(
+            emoji = "❤️",
+            title = "No breeding history yet",
+            subtitle = "Open the Breeding tab from the drawer to log heat, mating, pregnancy, or calving. Events for this animal will appear here."
+        )
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        if (pregnancies.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Pregnancies (${pregnancies.size})",
+                    fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                pregnancies.forEach { p ->
+                    val isActive = p.isActive
+                    HistoryRow(
+                        emoji = "🤰",
+                        title = if (isActive) "Active · due ${p.expectedCalvingDate}"
+                                else "Calved ${p.actualCalvingDate}",
+                        subtitle = "Confirmed ${p.confirmationDate} • ${p.pdMethod.displayName}",
+                        extra = listOfNotNull(
+                            "Dry period: ${p.dryPeriodStart}",
+                            p.calvingOutcome?.let { "${it.emoji} ${it.displayName}" },
+                            p.calvingDifficulty?.let { "Difficulty $it/4" }
+                        ).joinToString(" · ").ifBlank { null },
+                        badge = if (isActive) "ACTIVE" else null,
+                        badgeColor = if (isActive) ColorPregnant else null,
+                        accent = if (isActive) ColorPregnant else PashuGreen
+                    )
+                }
+            }
+        }
+        if (breedings.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Matings (${breedings.size})",
+                    fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                breedings.forEach { b ->
+                    val statusColor = when (b.conceptionStatus) {
+                        com.pashu360.app.core.domain.model.ConceptionStatus.CONFIRMED -> PashuGreen
+                        com.pashu360.app.core.domain.model.ConceptionStatus.FAILED -> ColorSick
+                        com.pashu360.app.core.domain.model.ConceptionStatus.PENDING -> PashuAmber
+                    }
+                    HistoryRow(
+                        emoji = b.breedingType.emoji,
+                        title = "${b.breedingType.displayName} • ${b.breedingDate}",
+                        subtitle = "${b.conceptionStatus.emoji} ${b.conceptionStatus.displayName}",
+                        extra = listOfNotNull(
+                            b.bullName?.let { "🐂 $it" },
+                            b.aiTechnician?.let { "👨‍⚕️ $it" },
+                            b.semenBatch?.let { "Batch $it" }
+                        ).joinToString(" · ").ifBlank { null },
+                        accent = statusColor
+                    )
+                }
+            }
+        }
+        if (heats.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Heat events (${heats.size})",
+                    fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                heats.forEach { h ->
+                    HistoryRow(
+                        emoji = "♨️",
+                        title = "Detected ${h.detectionDate}",
+                        subtitle = "${h.intensity.displayName} • next expected ${h.expectedNextHeat()}",
+                        extra = h.symptoms.takeIf { it.isNotEmpty() }?.joinToString(", "),
+                        accent = when (h.intensity) {
+                            com.pashu360.app.core.domain.model.HeatIntensity.WEAK -> Color.Gray
+                            com.pashu360.app.core.domain.model.HeatIntensity.MEDIUM -> PashuAmber
+                            com.pashu360.app.core.domain.model.HeatIntensity.STRONG -> ColorSick
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimalReadonlyEmptyPane(
+    emoji: String,
+    title: String,
+    subtitle: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier.size(80.dp).clip(CircleShape)
+                .background(PashuGreen.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(emoji, fontSize = 40.sp)
+        }
+        Spacer(Modifier.height(12.dp))
+        Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(6.dp))
+        Text(subtitle, fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
 }

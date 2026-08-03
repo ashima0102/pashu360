@@ -13,7 +13,7 @@
 |---|---|---|---|
 | Authentication (UI + navigation) | 7 | 7 | 🟡 100% UI · Supabase backend pending |
 | Farm Management | 3 | 5 | 🟡 60% (Setup persists to Room; multi-farm pending Supabase) |
-| Animal Management | 14 | 14 | ✅ 100% |
+| Animal Management | 15 | 15 | ✅ 100% (added US-AM15 — full per-animal history tabs) |
 | Milk Production | 9 | 12 | ✅ 75% |
 | Feeding | 8 | 8 | ✅ 100% (log, inventory, low-stock alerts) |
 | Health | 10 | 10 | ✅ 100% (records + vaccinations + vet contacts + dialer) |
@@ -26,7 +26,7 @@
 | Notifications | 5 | 5 | ✅ 100% (vaccination + feed low-stock + heat + calving) |
 | Offline & Sync | 3 | 4 | 🟡 Room v8 done; Supabase sync pending |
 | Settings | 0 | 5 | ⬜ 0% |
-| **TOTAL** | **92** | **109** | **84%** |
+| **TOTAL** | **93** | **110** | **85%** |
 
 ---
 
@@ -74,10 +74,11 @@
 | US-AM09 | Transfer an animal to another farm | P2 | ⬜ | Multi-farm support pending Supabase |
 | US-AM10 | Edit any animal's details | P1 | 🟡 Status editable; full edit screen pending | Change Status dialog exists; full edit screen Phase 11 |
 | — | (bonus) Set initial status when adding an animal | P1 | ✅ Done | AddAnimalScreen status picker (Active/Pregnant/Dry/Sick) |
-| US-AM11 | See each animal's today's milk on the list | P1 | 🟡 Placeholder | Data comes with Phase 2 (Milk) |
+| US-AM11 | See each animal's today's milk on the list | P1 | 🟡 Placeholder | Data comes with Phase 2 (Milk); Animal Detail Milk tab now shows full history |
 | US-AM12 | Add an RFID tag number to an animal | P2 | ✅ Done | RFID field in Room + domain |
 | US-AM13 | Print the QR code for an animal's ear tag | P2 | ⬜ | Share sheet pending |
 | US-AM14 | See a quick summary of each animal | P1 | ✅ Done | Overview tab: breed, age, weight, status, notes |
+| US-AM15 | See full history of milk, vaccinations, health, feeding, and breeding for an animal | P1 | ✅ Done | All 6 AnimalDetail tabs wired to per-animal repository queries with OVERDUE/DUE-TODAY badges, severity strips, conception status colours |
 
 ---
 

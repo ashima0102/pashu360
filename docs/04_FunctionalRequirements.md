@@ -10,7 +10,7 @@
 |---|---|---|---|
 | Authentication | 6/8 | 8 | 🟡 UI + navigation done, Supabase pending |
 | Farm Management | 5/6 | 6 | ✅ Farm entity persisted in Room v8 (multi-farm pending Supabase) |
-| Animal Management | 12/14 | 14 | ✅ Phase 1 |
+| Animal Management | 14/15 | 15 | ✅ Phase 1 + per-animal history tabs |
 | Milk Production | 10/13 | 13 | ✅ Phase 2 |
 | Feeding | 8/8 | 8 | ✅ Phase 7 |
 | Health | 8/9 | 9 | ✅ Phase 3 + 6 (records + vaccinations + vet contacts + dialer) |
@@ -23,7 +23,7 @@
 | Notifications | 6/6 | 6 | ✅ Phase 5 + 6 + 7 + 8 (vaccine + feed low-stock + heat + calving) |
 | Offline | 3/5 | 5 | 🟡 Room v8 done; Supabase sync pending Phase 10 |
 | Settings | 0/7 | 7 | ⬜ Phase 11 |
-| **TOTAL** | **90/127** | **127** | **71%** |
+| **TOTAL** | **92/128** | **128** | **72%** |
 
 ---
 
@@ -68,15 +68,16 @@
 | FR-ANIM-03 | System shall allow scanning QR code to open animal profile | P1 | ✅ Done (CameraX + ML Kit) |
 | FR-ANIM-04 | System shall allow searching animals by name and tag ID | P1 | ✅ Done |
 | FR-ANIM-05 | System shall allow filtering animals by status | P1 | ✅ Done (chips) |
-| FR-ANIM-06 | System shall display a chronological timeline of all animal events | P1 | 🟡 UI (tabs) built |
-| FR-ANIM-07 | System shall allow transferring an animal to another farm | P2 | ⬜ |
-| FR-ANIM-08 | System shall support marking animals as Sold with price and buyer | P2 | 🟡 Data model ready |
-| FR-ANIM-09 | System shall support marking animals as Deceased with reason | P2 | 🟡 Data model ready |
+| FR-ANIM-06 | System shall display a chronological timeline of all animal events | P1 | ✅ Done — 6 AnimalDetail tabs (Overview, Milk, Vaccination, Health, Feeding, Breeding) query per-animal repository flows |
+| FR-ANIM-07 | System shall allow transferring an animal to another farm | P2 | ⬜ Pending multi-farm (Phase 10 Supabase) |
+| FR-ANIM-08 | System shall support marking animals as Sold with price and buyer | P2 | 🟡 Status change works via badge tap; sale-price + buyer fields pending |
+| FR-ANIM-09 | System shall support marking animals as Deceased with reason | P2 | 🟡 Status change works; reason field pending |
 | FR-ANIM-10 | System shall support RFID tag field | P2 | ✅ Done (in schema) |
-| FR-ANIM-11 | System shall allow photo upload from camera or gallery | P1 | ⬜ (placeholder shown) |
+| FR-ANIM-11 | System shall allow photo upload from camera or gallery | P1 | ⬜ Placeholder shown; upload pipeline pending |
 | FR-ANIM-12 | System shall generate QR code printable via share sheet | P2 | ⬜ |
-| FR-ANIM-13 | System shall show today's milk amount on each animal card | P1 | 🟡 Placeholder (Phase 2) |
-| FR-ANIM-14 | System shall allow editing all animal fields | P1 | ⬜ (Edit screen TBD) |
+| FR-ANIM-13 | System shall show today's milk amount on each animal card | P1 | 🟡 List card placeholder; Animal Detail Milk tab shows full history |
+| FR-ANIM-14 | System shall allow editing all animal fields | P1 | 🟡 Status editable via badge tap; full edit screen pending |
+| FR-ANIM-15 | System shall set initial status on add (Active/Pregnant/Dry/Sick) | P1 | ✅ Done — AddAnimalScreen status picker chips |
 
 ---
 

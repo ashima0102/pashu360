@@ -14,6 +14,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.4] — 2026-08-03 · Animal profile now shows full per-animal history ✅
+
+The Milk / Vaccination / Health / Feeding / Breeding tabs on the animal
+profile were placeholder cards. Records saved via the drawer's Feeding /
+Breeding screens or the header quick-actions were written to Room
+correctly, but the corresponding tab on the same animal still showed a
+"Coming soon" card.
+
+### Added
+- `AnimalDetailViewModel` gains five new StateFlow lists:
+  `milkHistory`, `vaccinationHistory`, `healthHistory`, `feedHistory`,
+  `heatHistory`, `breedingHistoryForAnimal`, `pregnancyHistoryForAnimal`
+- New `BreedingRepository.observeBreedingsForAnimal()` and
+  `observePregnanciesForAnimal()` methods + `PregnancyRecordDao.observeForAnimal`
+- `MilkHistoryTab` — quantity, session, fat%/SNF%
+- `VaccinationHistoryTab` — vaccine name, next-due date, batch, OVERDUE / DUE TODAY badges
+- `HealthHistoryTab` — event type emoji, severity strip, symptoms, medicine
+- `FeedingHistoryTab` — quantity + unit, feed type, time-of-day, estimated cost
+- `BreedingHistoryTab` — three sections (Pregnancies with ACTIVE badge,
+  Matings color-coded by conception status, Heat events by intensity)
+- Vaccination + Milk + Health tabs' empty state includes a primary-action
+  button that opens the matching quick-action sheet from the header
+- Feeding + Breeding tabs' empty state points to the drawer destinations
+  since those are logged at farm level
+
+Merged via PR #16 + PR #17
+
+---
+
 ## [0.9.3] — 2026-08-02 · Farmer polish: LSD, Transition Feed, editable status ✅
 
 Farmer-requested tweaks after live testing the setup.

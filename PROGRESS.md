@@ -247,11 +247,11 @@ Planned:
 | Metric | Count |
 |---|---|
 | Total Kotlin files | ~100+ |
-| Total lines of code | ~15,000 |
-| Screens built (functional) | 22+ of 32 (~69%) |
+| Total lines of code | ~15,500 |
+| Screens built (functional) | 23 of 32 (~72%) |
 | Modules complete | 8 of 11 (~73%) |
 | Room DB version | 8 |
-| Merged PRs | 14 |
+| Merged PRs | 17 |
 
 ---
 
@@ -273,10 +273,23 @@ Planned:
 - `AnimalFilter.SOLD` → `INACTIVE` (umbrella for sold + deceased)
 - All Animal list queries now `ORDER BY tag_id DESC` — newest first
 
+**PR #15** — docs sync after PR #13 + #14
+
+**PR #16** — Animal Detail tabs: real Milk / Vaccination / Health history
+- The tabs were `TabPlaceholder`s. Now they query the repository and show
+  per-animal records with OVERDUE / DUE TODAY badges on vaccinations,
+  severity strip on health events, fat%/SNF% on milk
+
+**PR #17** — Animal Detail tabs: real Feeding / Breeding history
+- New `BreedingRepository.observeBreedingsForAnimal()` and
+  `observePregnanciesForAnimal()` methods + DAO query
+- Breeding tab groups records into Pregnancies (ACTIVE badge) / Matings
+  (conception-status color) / Heat events (intensity color)
+
 ---
 
 ## Repository
 
 - **GitHub:** https://github.com/ashima0102/pashu360
 - **Default branch:** `main` (branch-protected, PR-only)
-- **Latest merged PR:** #14 — Farmer polish (LSD, Transition Feed, editable status)
+- **Latest merged PR:** #17 — Animal Detail Feeding + Breeding tabs

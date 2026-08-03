@@ -458,6 +458,7 @@ private fun VetContactsTab(contacts: List<VetContact>) {
 
 @Composable
 private fun VetContactCard(c: VetContact) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -486,7 +487,13 @@ private fun VetContactCard(c: VetContact) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            IconButton(onClick = { /* TODO: launch dialer */ }) {
+            IconButton(onClick = {
+                val intent = android.content.Intent(
+                    android.content.Intent.ACTION_DIAL,
+                    android.net.Uri.parse("tel:${c.phone}")
+                )
+                context.startActivity(intent)
+            }) {
                 Icon(Icons.Filled.Call, "Call", tint = PashuGreen)
             }
         }

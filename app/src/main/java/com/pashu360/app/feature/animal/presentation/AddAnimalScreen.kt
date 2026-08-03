@@ -43,6 +43,19 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import android.widget.Toast
 
+data class AnimalFormHandlers(
+    val onTagIdChanged: (String) -> Unit,
+    val onNameChanged: (String) -> Unit,
+    val onBreedChanged: (String) -> Unit,
+    val onGenderChanged: (com.pashu360.app.core.domain.model.Gender) -> Unit,
+    val onStatusChanged: (com.pashu360.app.core.domain.model.AnimalStatus) -> Unit,
+    val onDobChanged: (kotlinx.datetime.LocalDate?) -> Unit,
+    val onWeightChanged: (String) -> Unit,
+    val onPurchasePriceChanged: (String) -> Unit,
+    val onNotesChanged: (String) -> Unit,
+    val onSubmit: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAnimalScreen(
@@ -67,10 +80,49 @@ fun AddAnimalScreen(
         }
     }
 
+    AnimalFormScaffold(
+        title = "Add Animal",
+        submitLabel = "Save Animal",
+        uiState = uiState,
+        onBack = onBack,
+        handlers = AnimalFormHandlers(
+            onTagIdChanged = viewModel::onTagIdChanged,
+            onNameChanged = viewModel::onNameChanged,
+            onBreedChanged = viewModel::onBreedChanged,
+            onGenderChanged = viewModel::onGenderChanged,
+            onStatusChanged = viewModel::onStatusChanged,
+            onDobChanged = viewModel::onDobChanged,
+            onWeightChanged = viewModel::onWeightChanged,
+            onPurchasePriceChanged = viewModel::onPurchasePriceChanged,
+            onNotesChanged = viewModel::onNotesChanged,
+            onSubmit = viewModel::onSubmit
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AnimalFormPublic(
+    title: String,
+    submitLabel: String,
+    uiState: AddAnimalUiState,
+    onBack: () -> Unit,
+    handlers: AnimalFormHandlers
+) = AnimalFormScaffold(title, submitLabel, uiState, onBack, handlers)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AnimalFormScaffold(
+    title: String,
+    submitLabel: String,
+    uiState: AddAnimalUiState,
+    onBack: () -> Unit,
+    handlers: AnimalFormHandlers
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add Animal", fontWeight = FontWeight.Bold) },
+                title = { Text(title, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -84,7 +136,7 @@ fun AddAnimalScreen(
                 color = MaterialTheme.colorScheme.surface
             ) {
                 Button(
-                    onClick = { viewModel.onSubmit() },
+                    onClick = { handlers.onSubmit() },
                     enabled = uiState.isValid && !uiState.isSubmitting,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -102,7 +154,7 @@ fun AddAnimalScreen(
                     } else {
                         Icon(Icons.Filled.Check, null, tint = Color.White)
                         Spacer(Modifier.width(8.dp))
-                        Text("Save Animal",
+                        Text(submitLabel,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White)
@@ -146,7 +198,7 @@ fun AddAnimalScreen(
             InputBlock(label = "Tag ID *") {
                 OutlinedTextField(
                     value = uiState.tagId,
-                    onValueChange = viewModel::onTagIdChanged,
+                    onValueChange = handlers.onTagIdChanged,
                     placeholder = { Text("Auto-generated (editable)") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -158,7 +210,7 @@ fun AddAnimalScreen(
             InputBlock(label = "Animal Name (optional)") {
                 OutlinedTextField(
                     value = uiState.name,
-                    onValueChange = viewModel::onNameChanged,
+                    onValueChange = handlers.onNameChanged,
                     placeholder = { Text("Gouri, Rani, Lakshmi...") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -173,16 +225,16 @@ fun AddAnimalScreen(
             InputBlock(label = "Breed") {
                 BreedDropdown(
                     selected = uiState.breed,
-                    onSelected = viewModel::onBreedChanged
+                    onSelected = handlers.onBreedChanged
                 )
             }
 
             InputBlock(label = "Gender") {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     GenderChoice("Female", uiState.gender == Gender.FEMALE,
-                        Modifier.weight(1f)) { viewModel.onGenderChanged(Gender.FEMALE) }
+                        Modifier.weight(1f)) { handlers.onGenderChanged(Gender.FEMALE) }
                     GenderChoice("Male", uiState.gender == Gender.MALE,
-                        Modifier.weight(1f)) { viewModel.onGenderChanged(Gender.MALE) }
+                        Modifier.weight(1f)) { handlers.onGenderChanged(Gender.MALE) }
                 }
             }
 
@@ -197,7 +249,7 @@ fun AddAnimalScreen(
                             label = s.displayName,
                             selected = uiState.status == s,
                             modifier = Modifier.weight(1f),
-                            onClick = { viewModel.onStatusChanged(s) }
+                            onClick = { handlers.onStatusChanged(s) }
                         )
                     }
                 }
@@ -206,14 +258,14 @@ fun AddAnimalScreen(
             InputBlock(label = "Date of Birth") {
                 DobPicker(
                     dob = uiState.dob,
-                    onDobChanged = viewModel::onDobChanged
+                    onDobChanged = handlers.onDobChanged
                 )
             }
 
             InputBlock(label = "Weight (kg)") {
                 OutlinedTextField(
                     value = uiState.weight,
-                    onValueChange = viewModel::onWeightChanged,
+                    onValueChange = handlers.onWeightChanged,
                     placeholder = { Text("420") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
@@ -229,7 +281,7 @@ fun AddAnimalScreen(
             InputBlock(label = "Purchase Price (₹)") {
                 OutlinedTextField(
                     value = uiState.purchasePrice,
-                    onValueChange = viewModel::onPurchasePriceChanged,
+                    onValueChange = handlers.onPurchasePriceChanged,
                     placeholder = { Text("35000") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
@@ -242,7 +294,7 @@ fun AddAnimalScreen(
             InputBlock(label = "Notes") {
                 OutlinedTextField(
                     value = uiState.notes,
-                    onValueChange = viewModel::onNotesChanged,
+                    onValueChange = handlers.onNotesChanged,
                     placeholder = { Text("Any notes about this animal...") },
                     minLines = 2,
                     maxLines = 4,

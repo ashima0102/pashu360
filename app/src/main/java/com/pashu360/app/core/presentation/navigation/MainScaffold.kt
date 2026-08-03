@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -43,15 +44,18 @@ import com.pashu360.app.core.presentation.components.PashuDrawer
 import com.pashu360.app.feature.animal.presentation.AddAnimalScreen
 import com.pashu360.app.feature.animal.presentation.AnimalDetailScreen
 import com.pashu360.app.feature.animal.presentation.AnimalListScreen
+import com.pashu360.app.feature.animal.presentation.EditAnimalScreen
 import com.pashu360.app.feature.animal.presentation.QrScannerScreen
 import com.pashu360.app.feature.breeding.presentation.BreedingScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardScreen
 import com.pashu360.app.feature.dashboard.presentation.DashboardViewModel
+import com.pashu360.app.feature.farm.presentation.FarmInfoScreen
 import com.pashu360.app.feature.feeding.presentation.FeedingScreen
 import com.pashu360.app.feature.finance.presentation.FinanceScreen
 import com.pashu360.app.feature.health.presentation.HealthScreen
 import com.pashu360.app.feature.milk.presentation.MilkScreen
 import com.pashu360.app.feature.notifications.presentation.AlertsScreen
+import com.pashu360.app.DeepLink
 import kotlinx.coroutines.launch
 
 data class BottomNavItem(
@@ -65,10 +69,21 @@ fun MainScaffold(
     rootNavController: NavController,
     navController: NavHostController = rememberNavController(),
     badgeViewModel: AlertBadgeViewModel = hiltViewModel(),
-    dashboardViewModel: DashboardViewModel = hiltViewModel()
+    dashboardViewModel: DashboardViewModel = hiltViewModel(),
+    pendingDeepLink: DeepLink? = null,
+    onDeepLinkConsumed: () -> Unit = {}
 ) {
     val alertCount by badgeViewModel.unresolvedCount.collectAsStateWithLifecycle()
     val dashboardState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
+
+    // If the app was opened via a notification's pashu360://animal/{id} link,
+    // navigate the inner NavHost to AnimalDetail once it's ready.
+    LaunchedEffect(pendingDeepLink) {
+        if (pendingDeepLink is DeepLink.Animal) {
+            navController.navigate(Screen.AnimalDetail.createRoute(pendingDeepLink.animalId))
+            onDeepLinkConsumed()
+        }
+    }
 
     val bottomNavItems = listOf(
         BottomNavItem(Screen.Dashboard, Icons.Filled.Home, "Home"),
@@ -237,10 +252,7 @@ fun MainScaffold(
 
                 // ── DRAWER DESTINATIONS ─────────────────────────
                 composable(Screen.FarmInfo.route) {
-                    ComingSoonScreen(
-                        title = "Farm Info",
-                        subtitle = "Edit your farm details: name, location, GPS, barns.",
-                        icon = Icons.Filled.Home,
+                    FarmInfoScreen(
                         alertCount = alertCount,
                         onMenuClick = { scope.launch { drawerState.open() } },
                         onBellClick = { navController.navigate(Screen.Alerts.route) },
@@ -313,12 +325,26 @@ fun MainScaffold(
                     val animalId = entry.arguments?.getString("animalId") ?: return@composable
                     AnimalDetailScreen(
                         animalId = animalId,
-                        onBack = { navController.popBackStack() }
+                        onBack = { navController.popBackStack() },
+                        onEditClick = { id ->
+                            navController.navigate(Screen.EditAnimal.createRoute(id))
+                        },
+                        onScanQrClick = { navController.navigate(Screen.QrScanner.route) }
                     )
                 }
 
                 composable(Screen.AddAnimal.route) {
                     AddAnimalScreen(
+                        onSaved = { navController.popBackStack() },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = Screen.EditAnimal.route,
+                    arguments = listOf(navArgument("animalId") { type = NavType.StringType })
+                ) {
+                    EditAnimalScreen(
                         onSaved = { navController.popBackStack() },
                         onBack = { navController.popBackStack() }
                     )

@@ -38,6 +38,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -401,8 +403,13 @@ private fun EmailLoginBlock(
     )
 
     Spacer(Modifier.height(8.dp))
+    val ctx = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        TextButton(onClick = { /* TODO: forgot password */ }) {
+        TextButton(onClick = {
+            Toast.makeText(ctx,
+                "Password reset needs a backend connection — coming with cloud sync.",
+                Toast.LENGTH_LONG).show()
+        }) {
             Text("Forgot password?", color = PashuGreen, fontWeight = FontWeight.Medium)
         }
     }
@@ -410,7 +417,15 @@ private fun EmailLoginBlock(
     Spacer(Modifier.height(8.dp))
 
     Button(
-        onClick = onLogin,
+        onClick = {
+            // Backend auth lands with Phase 10 Supabase — until then the
+            // email/password combo isn't verified against any server. Warn
+            // the farmer but let them in so local-only testing works.
+            Toast.makeText(ctx,
+                "Demo mode: password not verified. Real auth arrives with cloud sync.",
+                Toast.LENGTH_LONG).show()
+            onLogin()
+        },
         enabled = email.isNotBlank() && password.length >= 8,
         modifier = Modifier
             .fillMaxWidth()

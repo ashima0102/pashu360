@@ -60,13 +60,17 @@ import kotlin.time.ExperimentalTime
 fun AnimalDetailScreen(
     animalId: String,
     viewModel: AnimalDetailViewModel = hiltViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onEditClick: (String) -> Unit = {},
+    onScanQrClick: () -> Unit = {}
 ) {
     val animal by viewModel.animal.collectAsStateWithLifecycle()
     val milkSheet by viewModel.milkSheet.collectAsStateWithLifecycle()
     val vaccinationSheet by viewModel.vaccinationSheet.collectAsStateWithLifecycle()
     val healthSheet by viewModel.healthSheet.collectAsStateWithLifecycle()
     val statusPickerVisible by viewModel.statusPickerVisible.collectAsStateWithLifecycle()
+    val pendingSold by viewModel.pendingSold.collectAsStateWithLifecycle()
+    val pendingDeceased by viewModel.pendingDeceased.collectAsStateWithLifecycle()
     val vaccinationHistory by viewModel.vaccinationHistory.collectAsStateWithLifecycle()
     val healthHistory by viewModel.healthHistory.collectAsStateWithLifecycle()
     val milkHistory by viewModel.milkHistory.collectAsStateWithLifecycle()
@@ -87,6 +91,18 @@ fun AnimalDetailScreen(
             current = currentStatus,
             onDismiss = viewModel::closeStatusPicker,
             onSelect = viewModel::changeStatus
+        )
+    }
+    if (pendingSold) {
+        SoldCaptureDialog(
+            onDismiss = viewModel::cancelSoldCapture,
+            onConfirm = viewModel::confirmSold
+        )
+    }
+    if (pendingDeceased) {
+        DeceasedCaptureDialog(
+            onDismiss = viewModel::cancelDeceasedCapture,
+            onConfirm = viewModel::confirmDeceased
         )
     }
 
@@ -157,10 +173,10 @@ fun AnimalDetailScreen(
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
                         }
                         Spacer(Modifier.weight(1f))
-                        IconButton(onClick = { /* TODO edit */ }) {
+                        IconButton(onClick = { onEditClick(animalId) }) {
                             Icon(Icons.Filled.Edit, null, tint = Color.White)
                         }
-                        IconButton(onClick = { /* TODO qr */ }) {
+                        IconButton(onClick = onScanQrClick) {
                             Icon(Icons.Filled.QrCode2, null, tint = Color.White)
                         }
                     }
@@ -1471,4 +1487,111 @@ private fun AnimalReadonlyEmptyPane(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
+}
+
+// ─────────────────────────────────────────────────────────
+// SOLD / DECEASED CAPTURE DIALOGS
+// ─────────────────────────────────────────────────────────
+
+@Composable
+private fun SoldCaptureDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (kotlinx.datetime.LocalDate, Double?, String?) -> Unit
+) {
+    val today = remember {
+        @OptIn(ExperimentalTime::class)
+        kotlin.time.Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
+    var price by remember { androidx.compose.runtime.mutableStateOf("") }
+    var buyer by remember { androidx.compose.runtime.mutableStateOf("") }
+    var saleDate by remember { androidx.compose.runtime.mutableStateOf<kotlinx.datetime.LocalDate?>(today) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Mark as Sold") },
+        text = {
+            Column {
+                Text("Capture sale details for your records.",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(12.dp))
+                SheetDateField(
+                    label = "Sale date",
+                    date = saleDate,
+                    onDateChange = { saleDate = it }
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = price, onValueChange = { price = it.filter { c -> c.isDigit() || c == '.' } },
+                    label = { Text("Sale price ₹ (optional)") },
+                    singleLine = true, shape = RoundedCornerShape(10.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = buyer, onValueChange = { buyer = it },
+                    label = { Text("Sold to (optional)") },
+                    singleLine = true, shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm(saleDate ?: today, price.toDoubleOrNull(), buyer)
+            }) { Text("Confirm Sold", color = PashuGreen, fontWeight = FontWeight.Bold) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+    )
+}
+
+@Composable
+private fun DeceasedCaptureDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (kotlinx.datetime.LocalDate, String?) -> Unit
+) {
+    val today = remember {
+        @OptIn(ExperimentalTime::class)
+        kotlin.time.Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
+    var reason by remember { androidx.compose.runtime.mutableStateOf("") }
+    var deathDate by remember { androidx.compose.runtime.mutableStateOf<kotlinx.datetime.LocalDate?>(today) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Mark as Deceased") },
+        text = {
+            Column {
+                Text("This animal will move to the Inactive filter.",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(12.dp))
+                SheetDateField(
+                    label = "Date of death",
+                    date = deathDate,
+                    onDateChange = { deathDate = it }
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = reason, onValueChange = { reason = it },
+                    label = { Text("Reason (optional)") },
+                    shape = RoundedCornerShape(10.dp),
+                    maxLines = 2,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PashuGreen),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm(deathDate ?: today, reason)
+            }) { Text("Confirm", color = ColorSick, fontWeight = FontWeight.Bold) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+    )
 }

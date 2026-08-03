@@ -164,6 +164,12 @@ class AnimalDetailViewModel @Inject constructor(
     private val _statusPickerVisible = MutableStateFlow(false)
     val statusPickerVisible: StateFlow<Boolean> = _statusPickerVisible.asStateFlow()
 
+    private val _pendingSold = MutableStateFlow(false)
+    val pendingSold: StateFlow<Boolean> = _pendingSold.asStateFlow()
+
+    private val _pendingDeceased = MutableStateFlow(false)
+    val pendingDeceased: StateFlow<Boolean> = _pendingDeceased.asStateFlow()
+
     private val _events = Channel<AnimalDetailEvent>()
     val events = _events.receiveAsFlow()
 
@@ -171,14 +177,62 @@ class AnimalDetailViewModel @Inject constructor(
     fun closeStatusPicker() { _statusPickerVisible.value = false }
 
     fun changeStatus(status: AnimalStatus) {
+        _statusPickerVisible.value = false
+        when (status) {
+            AnimalStatus.SOLD -> { _pendingSold.value = true }
+            AnimalStatus.DECEASED -> { _pendingDeceased.value = true }
+            else -> writeStatusOnly(status)
+        }
+    }
+
+    private fun writeStatusOnly(status: AnimalStatus) {
         viewModelScope.launch {
             animalRepository.updateStatus(animalId, status.value)
-                .onSuccess {
-                    _statusPickerVisible.value = false
-                    _events.send(AnimalDetailEvent.StatusChanged(status))
-                }
+                .onSuccess { _events.send(AnimalDetailEvent.StatusChanged(status)) }
                 .onFailure { e ->
                     _events.send(AnimalDetailEvent.ShowError(e.message ?: "Could not update status"))
+                }
+        }
+    }
+
+    fun cancelSoldCapture() { _pendingSold.value = false }
+    fun cancelDeceasedCapture() { _pendingDeceased.value = false }
+
+    fun confirmSold(saleDate: LocalDate, salePriceRupees: Double?, buyer: String?) {
+        val current = animal.value ?: return
+        viewModelScope.launch {
+            val updated = current.copy(
+                status = AnimalStatus.SOLD,
+                soldDate = saleDate,
+                soldPrice = salePriceRupees,
+                soldTo = buyer?.takeIf { it.isNotBlank() }
+            )
+            animalRepository.updateAnimal(updated)
+                .onSuccess {
+                    _pendingSold.value = false
+                    _events.send(AnimalDetailEvent.StatusChanged(AnimalStatus.SOLD))
+                }
+                .onFailure { e ->
+                    _events.send(AnimalDetailEvent.ShowError(e.message ?: "Could not save"))
+                }
+        }
+    }
+
+    fun confirmDeceased(deceasedDate: LocalDate, reason: String?) {
+        val current = animal.value ?: return
+        viewModelScope.launch {
+            val updated = current.copy(
+                status = AnimalStatus.DECEASED,
+                deceasedDate = deceasedDate,
+                deceasedReason = reason?.takeIf { it.isNotBlank() }
+            )
+            animalRepository.updateAnimal(updated)
+                .onSuccess {
+                    _pendingDeceased.value = false
+                    _events.send(AnimalDetailEvent.StatusChanged(AnimalStatus.DECEASED))
+                }
+                .onFailure { e ->
+                    _events.send(AnimalDetailEvent.ShowError(e.message ?: "Could not save"))
                 }
         }
     }

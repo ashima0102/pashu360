@@ -155,14 +155,18 @@ class BreedingRepositoryImpl @Inject constructor(
         createCalfAnimal: Animal?
     ): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
+            val row = requireNotNull(pregnancyDao.getById(pregnancyId)) {
+                "Pregnancy $pregnancyId not found"
+            }
+            // Block accidental double-calving on the same pregnancy row.
+            require(row.actualCalvingDate == null) {
+                "This pregnancy has already been calved on ${row.actualCalvingDate}"
+            }
+
             // Save calf first if provided so we have its ID to link back
             val calfId = createCalfAnimal?.let { calf ->
                 animalRepository.addAnimal(calf)
                 calf.id
-            }
-
-            val row = requireNotNull(pregnancyDao.getById(pregnancyId)) {
-                "Pregnancy $pregnancyId not found"
             }
             val updated = row.copy(
                 actualCalvingDate = actualDate.toString(),

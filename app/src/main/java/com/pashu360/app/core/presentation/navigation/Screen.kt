@@ -35,6 +35,9 @@ sealed class Screen(val route: String) {
         fun createRoute(animalId: String) = "animal_detail/$animalId"
     }
     object AddAnimal : Screen("add_animal")
+    object EditAnimal : Screen("edit_animal/{animalId}") {
+        fun createRoute(animalId: String) = "edit_animal/$animalId"
+    }
     object QrScanner : Screen("qr_scanner")
 
     // Milk sub-screens

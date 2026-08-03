@@ -81,6 +81,9 @@ class BreedingRepositoryImpl @Inject constructor(
             }
         }
 
+    override fun observeBreedingsForAnimal(animalId: String): Flow<List<BreedingRecord>> =
+        breedingDao.observeForAnimal(animalId).map { list -> list.map { it.toDomain() } }
+
     override fun observeAwaitingPd(farmId: String): Flow<List<BreedingRecordDetail>> =
         combine(breedingDao.observeAwaitingPd(farmId), animalsMap(farmId)) { rows, animals ->
             rows.map { r ->
@@ -116,6 +119,9 @@ class BreedingRepositoryImpl @Inject constructor(
         combine(pregnancyDao.observeAll(farmId), animalsMap(farmId)) { rows, animals ->
             rows.map { toDetail(it, animals) }
         }
+
+    override fun observePregnanciesForAnimal(animalId: String): Flow<List<PregnancyRecord>> =
+        pregnancyDao.observeForAnimal(animalId).map { list -> list.map { it.toDomain() } }
 
     override fun observeActivePregnancies(farmId: String): Flow<List<PregnancyDetail>> =
         combine(pregnancyDao.observeActive(farmId), animalsMap(farmId)) { rows, animals ->

@@ -19,6 +19,7 @@ interface BreedingRepository {
 
     // Breeding
     fun observeBreedingRecords(farmId: String): Flow<List<BreedingRecordDetail>>
+    fun observeBreedingsForAnimal(animalId: String): Flow<List<BreedingRecord>>
     fun observeAwaitingPd(farmId: String): Flow<List<BreedingRecordDetail>>
     fun countConfirmed(farmId: String): Flow<Int>
     fun countAll(farmId: String): Flow<Int>
@@ -28,6 +29,7 @@ interface BreedingRepository {
 
     // Pregnancy
     fun observePregnancies(farmId: String): Flow<List<PregnancyDetail>>
+    fun observePregnanciesForAnimal(animalId: String): Flow<List<PregnancyRecord>>
     fun observeActivePregnancies(farmId: String): Flow<List<PregnancyDetail>>
     fun observeCompletedPregnancies(farmId: String): Flow<List<PregnancyDetail>>
     fun countActivePregnancies(farmId: String): Flow<Int>
